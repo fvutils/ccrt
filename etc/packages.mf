@@ -1,0 +1,7 @@
+#****************************************************************************
+#* packages.mf for ccrt
+#****************************************************************************
+
+simscripts@http://github.com/mballance/simscripts.git
+
+googletest-ivpm@http://github.com/mballance/googletest-ivpm.git
