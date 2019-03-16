@@ -20,6 +20,8 @@ include $(ROOT_DIR)/etc/ivpm.info
 PROJECT := $(name)
 
 SRC_FILES := $(wildcard $(ROOT_DIR)/src/*.cpp)
+CXXFLAGS += -std=c++11 -I$(ROOT_DIR)/boolector/include
+CXXFLAGS += -g
 
 # Include makefiles with dependencies
 MK_INCLUDES += $(wildcard $(ROOT_DIR)/mkfiles/*.mk)
@@ -43,7 +45,7 @@ build : $($(PROJECT)_deps)
 endif
 
 $(BUILD_DIR)/ccrt.d : $(notdir $(SRC_FILES:.cpp=.o))
-	$(Q)echo "TODO: ccrt.d"
+	$(Q)$(LD) -r -o libccrt.so $(notdir $(SRC_FILES:.cpp=.o))
 	
 
 $(SRC_FILES) : $(BUILD_DIR)/boolector.d
@@ -58,6 +60,7 @@ $(BUILD_DIR)/boolector.d : $(PACKAGES_DIR)/$(BOOLECTOR_ZIP)
 		--shared --prefix $(ROOT_DIR)/boolector
 	$(Q)cd $(BUILD_DIR)/boolector/$(BOOLECTOR_DIR)/build ; $(MAKE)
 	$(Q)cd $(BUILD_DIR)/boolector/$(BOOLECTOR_DIR)/build ; $(MAKE) install
+	$(Q)touch $@
 
 $(PACKAGES_DIR)/$(BOOLECTOR_ZIP) :
 	$(Q)mkdir -p $(PACKAGES_DIR)
