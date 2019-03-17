@@ -6,6 +6,7 @@
  */
 
 #include "RandObjCtor.h"
+#include "VarBase.h"
 #include <stdio.h>
 
 namespace ccrt {
@@ -60,6 +61,125 @@ RandObj *RandObjCtor::parent() const {
 	return ret;
 }
 
+//bool RandObjCtor::mkEq(const VarBase &lhs, const VarBase &rhs) {
+//	fprintf(stdout, "mkEq: lhs=%s rhs=%s\n", lhs.name().c_str(), rhs.name().c_str());
+//	return false;
+//}
+
+ConstraintBuilderExpr RandObjCtor::push_eq(
+		const ConstraintBuilderExpr		&lhs,
+		const ConstraintBuilderExpr		&rhs) {
+	BoolectorNode *n0, *n1;
+
+	if (lhs.bits() > rhs.bits()) {
+		n0 = lhs.node();
+		if (rhs.is_signed()) {
+			n1 = boolector_sext(
+					btor(),
+					rhs.node(),
+					lhs.bits());
+		} else {
+			n1 = boolector_uext(
+					btor(),
+					rhs.node(),
+					lhs.bits());
+		}
+
+	} else if (rhs.bits() > lhs.bits()) {
+		if (lhs.is_signed()) {
+			n0 = boolector_sext(
+					btor(),
+					lhs.node(),
+					rhs.bits());
+		} else {
+			n0 = boolector_uext(
+					btor(),
+					lhs.node(),
+					rhs.bits());
+		}
+		n1 = rhs.node();
+	} else {
+		n0 = lhs.node();
+		n1 = rhs.node();
+	}
+
+	BoolectorNode *eq = boolector_eq(
+			btor(),
+			n0,
+			n1);
+
+	pop_constraint(lhs.node(), rhs.node());
+
+	// Equal is always unsigned and 1-bit wide
+	return ConstraintBuilderExpr(eq, 1, false);
+}
+
+ConstraintBuilderExpr RandObjCtor::push_logical_and(
+		const ConstraintBuilderExpr		&lhs,
+		const ConstraintBuilderExpr		&rhs) {
+	fprintf(stdout, "push_logical_and\n");
+	BoolectorNode *n0, *n1;
+
+	if (lhs.bits() == 1) {
+		n0 = lhs.node();
+	} else {
+		n0 = boolector_ne(btor(), n0,
+				boolector_zero(btor(),
+						boolector_get_sort(btor(), lhs.node())));
+	}
+
+	if (rhs.bits() == 1) {
+		n1 = rhs.node();
+	} else {
+		n1 = boolector_ne(btor(), n1,
+				boolector_zero(btor(),
+						boolector_get_sort(btor(), rhs.node())));
+	}
+
+	BoolectorNode *n_and = boolector_and(btor(), n0, n1);
+	pop_constraint(lhs.node(), rhs.node());
+
+	return ConstraintBuilderExpr(n_and, 1, false);
+}
+
+void RandObjCtor::push_constraint(BoolectorNode *c) {
+	fprintf(stdout, "push_constraint %p\n", c);
+	m_constraints.push_back(c);
+}
+
+void RandObjCtor::pop_constraint(BoolectorNode *c) {
+	if (m_constraints.size() > 0) {
+		if (m_constraints.back() != c) {
+			fprintf(stdout, "Error: expecting constraint %p, but saw %p\n",
+					c, m_constraints.back());
+		} else {
+			m_constraints.pop_back();
+		}
+	} else {
+		fprintf(stdout, "Error: no constraints to pop\n");
+	}
+}
+
+void RandObjCtor::pop_constraint(BoolectorNode *c1, BoolectorNode *c2) {
+	if (m_constraints.size() >= 2) {
+		if (m_constraints.back() == c1 || m_constraints.back() == c2) {
+			m_constraints.pop_back();
+		} else {
+			fprintf(stdout, "Error(1): expecting constraint %p or %p, but saw %p\n",
+					c1, c2, m_constraints.back());
+		}
+		if (m_constraints.back() == c1 || m_constraints.back() == c2) {
+			m_constraints.pop_back();
+		} else {
+			fprintf(stdout, "Error(2): expecting constraint %p or %p, but saw %p\n",
+					c1, c2, m_constraints.back());
+		}
+	} else {
+		fprintf(stdout, "Error: need 2 constraints to pop, but have %d\n",
+				m_constraints.size());
+	}
+}
+
 void RandObjCtor::enter(CtorScope *scope) {
 	fprintf(stdout, "--> enter %p %p\n",
 			scope->typeinfo(),
@@ -87,6 +207,16 @@ void RandObjCtor::leave(CtorScope *scope) {
 	fprintf(stdout, "<-- leave %p %p\n",
 			scope->typeinfo(),
 			scope->scope());
+
+	if (m_scope_stack.size() == 0) {
+		fprintf(stdout, "Note: ready to complete RandObj construction %p\n",
+				m_active_rand_obj);
+		fprintf(stdout, "  %d accumulated constraints\n", m_constraints.size());
+		m_active_rand_obj->finalize(m_active_rand_obj);
+
+		// Clear out the constraints list
+		m_constraints.clear();
+	}
 }
 
 RandObjCtor *RandObjCtor::m_inst = 0;

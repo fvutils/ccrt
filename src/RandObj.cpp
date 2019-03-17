@@ -36,6 +36,8 @@ RandObj::RandObj() {
 		m_parent = 0;
 
 		m_btor = boolector_new();
+
+		fprintf(stdout, "Note: top-level variable ready to go\n");
 	}
 }
 
@@ -60,9 +62,10 @@ RandObj::RandObj(const CtorScope &scope) {
 
 		m_btor = boolector_new();
 		boolector_set_opt(m_btor, BTOR_OPT_MODEL_GEN, 1);
-	}
-	fprintf(stdout, "RandObj: this=%p parent=%p\n", this, parent);
 
+		// Let the constructor object know that we are active
+		obj_ctor.set_active_rand_obj(this);
+	}
 }
 
 RandObj::~RandObj() {
@@ -75,8 +78,8 @@ RandObj::~RandObj() {
 std::string RandObj::toString() {
 	std::string ret;
 
-	for (std::vector<VarBase *>::iterator it=m_fields.begin();
-			it != m_fields.end(); it++) {
+	for (std::vector<IRandObj *>::iterator it=m_children.begin();
+			it != m_children.end(); it++) {
 		ret += (*it)->toString() + "\n";
 	}
 
@@ -91,10 +94,13 @@ void RandObj::post_randomize() {
 }
 
 bool RandObj::do_randomize() {
+	bool ret = false;
 	if (m_parent) {
 		// Can only randomize a root field
 		return false;
 	}
+
+	do_pre_randomize();
 
 	int32_t sat = boolector_sat(m_btor);
 
@@ -102,23 +108,58 @@ bool RandObj::do_randomize() {
 
 	if (sat == BOOLECTOR_SAT) {
 		fprintf(stdout, "SAT\n");
-	} else if (sat == BOOLECTOR_UNSAT) {
-		fprintf(stdout, "UNSAT\n");
+		ret = true;
+
+		// Only call post-randomize if randomization succeeds
+		do_post_randomize();
 	} else {
-		fprintf(stdout, "sat=%d\n", sat);
+		if (sat == BOOLECTOR_UNSAT) {
+			fprintf(stdout, "UNSAT\n");
+		} else {
+			fprintf(stdout, "sat=%d\n", sat);
+		}
 	}
 
 	fprintf(stdout, "<-- do_randomize\n");
 
-	return true;
+
+	return ret;
 }
 
-void RandObj::add_field(VarBase *f) {
-	m_fields.push_back(f);
+void RandObj::do_pre_randomize() {
+	pre_randomize();
+	for (std::vector<IRandObj *>::iterator it=m_children.begin();
+			it != m_children.end(); it++) {
+		(*it)->do_pre_randomize();
+	}
 }
 
-void RandObj::add_child(RandObj *c) {
-	// TODO
+void RandObj::do_post_randomize() {
+	post_randomize();
+
+	for (std::vector<IRandObj *>::iterator it=m_children.begin();
+			it != m_children.end(); it++) {
+		(*it)->do_post_randomize();
+	}
+}
+
+void RandObj::add_child(IRandObj *c) {
+	m_children.push_back(c);
+}
+
+void RandObj::add_variable(VarBase *var) {
+	m_variables.push_back(var);
+}
+
+void RandObj::add_constraint(Constraint *c) {
+	m_constraints.push_back(c);
+}
+
+void RandObj::finalize(RandObj *root) {
+	for (std::vector<IRandObj *>::iterator it=m_children.begin();
+			it != m_children.end(); it++) {
+		(*it)->finalize(root);
+	}
 }
 
 } /* namespace ccrt */

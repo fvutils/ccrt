@@ -6,10 +6,12 @@
  */
 
 #pragma once
+#include "IRandObj.h"
 #include <vector>
 #include <string>
 #include "CtorScope.h"
 #include "IfElse.h"
+#include "Constraint.h"
 #include "boolector/boolector.h"
 
 namespace ccrt {
@@ -18,10 +20,11 @@ class Expr;
 class ConstraintStmt;
 class VarBase;
 template <typename T> class RandVar;
-class RandObj {
+class RandObj : public virtual IRandObj {
 public:
 	template <typename T> friend class RandVar;
 	friend class VarBase;
+	friend class RandObjCtor;
 	RandObj();
 
 	RandObj(const CtorScope &scope);
@@ -37,6 +40,7 @@ protected:
 	virtual void post_randomize();
 
 
+
 	IfElse &if_then();
 
 	void constraint(ConstraintStmt &c);
@@ -44,9 +48,18 @@ protected:
 private:
 	bool do_randomize();
 
-	void add_field(VarBase *f);
+	virtual void do_pre_randomize();
 
-	void add_child(RandObj *c);
+	virtual void do_post_randomize();
+
+	void add_child(IRandObj *c);
+
+	// Used to collect up all the variables in the system
+	void add_variable(VarBase *var);
+
+	void add_constraint(Constraint *c);
+
+	virtual void finalize(RandObj *root);
 
 	Btor *btor() { return m_btor; }
 
@@ -57,8 +70,13 @@ private:
 	Btor						*m_btor;
 	// TODO: handle to solver for this object
 
-	std::vector<VarBase *>		m_fields;
-	std::vector<RandObj *>		m_children;
+	std::vector<VarBase *>		m_variables;
+	std::vector<IRandObj *>		m_children;
+
+	// Collection of active constraint blocks for this type
+	// Note: base classes are constructed before extended classes,
+	// so we can iteratively 'kick out' overridden constraints
+	std::vector<Constraint *>	m_constraints;
 
 };
 

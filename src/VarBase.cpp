@@ -26,7 +26,7 @@ VarBase::VarBase(
 	m_node = boolector_var(btor, sort, name.c_str());
 
 	if (obj_ctor.scope()) {
-		obj_ctor.scope()->add_field(this);
+		obj_ctor.scope()->add_child(this);
 	} else {
 		fprintf(stdout, "Error: Var created without a parent\n");
 	}
@@ -39,10 +39,77 @@ VarBase::~VarBase() {
 }
 
 std::string VarBase::toString() {
-	std::string ret = m_name + " = ";
-	ret += boolector_bv_assignment(m_parent->btor(), m_node);
+	char tmp[64];
+
+	if (m_is_signed) {
+		sprintf(tmp, "%lld", m_value.ui64);
+	} else {
+		sprintf(tmp, "%llu", m_value.ui64);
+	}
+
+	std::string ret = m_name + " = " + tmp;
 
 	return ret;
+}
+
+void VarBase::finalize(RandObj *root) {
+	root->add_variable(this);
+}
+
+ConstraintBuilderExpr VarBase::operator ()() {
+	return ConstraintBuilderExpr(m_node, m_bits, m_is_signed);
+}
+
+ConstraintBuilderExpr VarBase::operator == (const ConstraintBuilderExpr &rhs) {
+	fprintf(stdout, "VarBase: EQ\n");
+	return RandObjCtor::inst().push_eq((*this), rhs);
+}
+
+ConstraintBuilderExpr VarBase::operator && (const ConstraintBuilderExpr &rhs) {
+	fprintf(stdout, "VarBase: AND\n");
+	return RandObjCtor::inst().push_logical_and((*this), rhs);
+}
+
+void VarBase::do_pre_randomize() {
+	// TODO: if we're not random, add in appropriate constraints
+}
+
+void VarBase::do_post_randomize() {
+	const char *val = boolector_bv_assignment(m_parent->btor(), m_node);
+
+	m_value.ui64 = 0;
+
+	switch (m_bits) {
+	case 8: {
+		for (uint32_t i=0; i<8; i++) {
+			m_value.ui8 <<= 1;
+			m_value.ui8 |= (val[i] == '1');
+		}
+	} break;
+
+	case 16: {
+		for (uint32_t i=0; i<16; i++) {
+			m_value.ui16 <<= 1;
+			m_value.ui16 |= (val[i] == '1');
+		}
+	} break;
+
+	case 32: {
+		for (uint32_t i=0; i<32; i++) {
+			m_value.ui32 <<= 1;
+			m_value.ui32 |= (val[i] == '1');
+		}
+	} break;
+
+	case 64: {
+		for (uint32_t i=0; i<64; i++) {
+			m_value.ui64 <<= 1;
+			m_value.ui64 |= (val[i] == '1');
+		}
+	} break;
+	default:
+		fprintf(stdout, "Error: unknown bits %d\n", m_bits);
+	}
 }
 
 }
