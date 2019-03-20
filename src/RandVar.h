@@ -34,7 +34,7 @@ private:
 template <> class RandVar<uint8_t> : public VarBase {
 public:
 
-	RandVar(const std::string &name=RandObjCtor::auto_name()) : VarBase(name, 8, false) { }
+	RandVar(const std::string &name=RandObjCtor::auto_name()) : VarBase(name, 8, false, true) { }
 
 	uint8_t operator ()() {
 		// TODO: need to map value over?
@@ -43,6 +43,10 @@ public:
 
 	ConstraintBuilderExpr operator == (const ConstraintBuilderExpr &rhs) {
 		return VarBase::operator == (rhs);
+	}
+
+	ConstraintBuilderExpr operator != (const ConstraintBuilderExpr &rhs) {
+		return VarBase::operator != (rhs);
 	}
 
 	ConstraintBuilderExpr operator && (const ConstraintBuilderExpr &rhs) {
@@ -57,7 +61,7 @@ public:
 template <> class RandVar<int8_t> : public VarBase {
 public:
 
-	RandVar(const std::string &name) : VarBase(name, 8, true) { }
+	RandVar(const std::string &name) : VarBase(name, 8, true, true) { }
 
 	int8_t operator ()() {
 		// TODO: need to map value over?
@@ -68,7 +72,7 @@ public:
 template <> class RandVar<uint16_t> : public VarBase {
 public:
 
-	RandVar(const std::string &name) : VarBase(name, 16, false) { }
+	RandVar(const std::string &name) : VarBase(name, 16, false, true) { }
 
 	uint16_t operator ()() {
 		// TODO: need to map value over?
@@ -80,7 +84,7 @@ public:
 template <> class RandVar<uint32_t> : public VarBase {
 public:
 
-	RandVar(const std::string &name) : VarBase(name, 32, false) { }
+	RandVar(const std::string &name) : VarBase(name, 32, false, true) { }
 
 	uint32_t operator ()() {
 		// TODO: need to map value over?
@@ -93,7 +97,7 @@ public:
 template <> class RandVar<int32_t> : public VarBase {
 public:
 
-	RandVar(const std::string &name) : VarBase(name, 32, true) { }
+	RandVar(const std::string &name) : VarBase(name, 32, true, true) { }
 
 	int32_t operator ()() {
 		// TODO: need to map value over?
@@ -105,7 +109,7 @@ public:
 template <> class RandVar<uint64_t> : public VarBase {
 public:
 
-	RandVar(const std::string &name) : VarBase(name, 64, false) { }
+	RandVar(const std::string &name) : VarBase(name, 64, false, true) { }
 
 	uint64_t operator ()() {
 		// TODO: need to map value over?
@@ -117,7 +121,7 @@ public:
 template <> class RandVar<int64_t> : public VarBase {
 public:
 
-	RandVar(const std::string &name) : VarBase(name, 64, true) { }
+	RandVar(const std::string &name) : VarBase(name, 64, true, true) { }
 
 	int64_t operator ()() {
 		// TODO: need to map value over?

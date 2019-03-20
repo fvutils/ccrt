@@ -71,37 +71,11 @@ ConstraintBuilderExpr RandObjCtor::push_eq(
 		const ConstraintBuilderExpr		&rhs) {
 	BoolectorNode *n0, *n1;
 
-	if (lhs.bits() > rhs.bits()) {
-		n0 = lhs.node();
-		if (rhs.is_signed()) {
-			n1 = boolector_sext(
-					btor(),
-					rhs.node(),
-					lhs.bits());
-		} else {
-			n1 = boolector_uext(
-					btor(),
-					rhs.node(),
-					lhs.bits());
-		}
+	resize(lhs, rhs, &n0, &n1);
 
-	} else if (rhs.bits() > lhs.bits()) {
-		if (lhs.is_signed()) {
-			n0 = boolector_sext(
-					btor(),
-					lhs.node(),
-					rhs.bits());
-		} else {
-			n0 = boolector_uext(
-					btor(),
-					lhs.node(),
-					rhs.bits());
-		}
-		n1 = rhs.node();
-	} else {
-		n0 = lhs.node();
-		n1 = rhs.node();
-	}
+	fprintf(stdout, "--> n1\n");
+	boolector_dump_btor_node(btor(), stdout, n1);
+	fprintf(stdout, "<-- n1\n");
 
 	BoolectorNode *eq = boolector_eq(
 			btor(),
@@ -112,6 +86,32 @@ ConstraintBuilderExpr RandObjCtor::push_eq(
 
 	// Equal is always unsigned and 1-bit wide
 	return ConstraintBuilderExpr(eq, 1, false);
+}
+
+ConstraintBuilderExpr RandObjCtor::push_neq(
+		const ConstraintBuilderExpr		&lhs,
+		const ConstraintBuilderExpr		&rhs) {
+	BoolectorNode *n0, *n1;
+
+	resize(lhs, rhs, &n0, &n1);
+
+	fprintf(stdout, "--> n0\n");
+	boolector_dump_btor_node(btor(), stdout, n0);
+	fprintf(stdout, "<-- n0\n");
+	fprintf(stdout, "--> n1\n");
+	boolector_dump_btor_node(btor(), stdout, n1);
+	fprintf(stdout, "<-- n1\n");
+
+	BoolectorNode *neq = boolector_not(btor(),
+			boolector_eq(
+					btor(),
+					n0,
+					n1));
+
+	pop_constraint(lhs.node(), rhs.node());
+
+	// Equal is always unsigned and 1-bit wide
+	return ConstraintBuilderExpr(neq, 1, false);
 }
 
 ConstraintBuilderExpr RandObjCtor::push_logical_and(
@@ -140,6 +140,41 @@ ConstraintBuilderExpr RandObjCtor::push_logical_and(
 	pop_constraint(lhs.node(), rhs.node());
 
 	return ConstraintBuilderExpr(n_and, 1, false);
+}
+
+void RandObjCtor::resize(
+		const ConstraintBuilderExpr		&lhs,
+		const ConstraintBuilderExpr		&rhs,
+		BoolectorNode 					**lhs_r,
+		BoolectorNode 					**rhs_r) {
+	*lhs_r = lhs.node();
+	*rhs_r = rhs.node();
+
+	if (lhs.bits() > rhs.bits()) {
+		if (rhs.is_signed()) {
+			*rhs_r = boolector_sext(
+					btor(),
+					rhs.node(),
+					(lhs.bits()-rhs.bits()));
+		} else {
+			*rhs_r = boolector_uext(
+					btor(),
+					rhs.node(),
+					(lhs.bits()-rhs.bits()));
+		}
+	} else if (rhs.bits() > lhs.bits()) {
+		if (lhs.is_signed()) {
+			*lhs_r = boolector_sext(
+					btor(),
+					lhs.node(),
+					(rhs.bits()-lhs.bits()));
+		} else {
+			*lhs_r = boolector_uext(
+					btor(),
+					lhs.node(),
+					(rhs.bits()-lhs.bits()));
+		}
+	}
 }
 
 void RandObjCtor::push_constraint(BoolectorNode *c) {

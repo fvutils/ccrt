@@ -20,7 +20,8 @@ public:
 	VarBase(
 			const std::string 	&name,
 			uint32_t			bits,
-			bool				is_signed);
+			bool				is_signed,
+			bool				is_rand);
 
 	virtual ~VarBase();
 
@@ -34,11 +35,15 @@ public:
 
 	bool is_signed() const { return m_is_signed; }
 
+	bool is_rand() const { return m_is_rand; }
+
 	virtual void finalize(RandObj *root);
 
 	ConstraintBuilderExpr operator ()();
 
 	ConstraintBuilderExpr operator == (const ConstraintBuilderExpr &rhs);
+
+	ConstraintBuilderExpr operator != (const ConstraintBuilderExpr &rhs);
 
 	ConstraintBuilderExpr operator && (const ConstraintBuilderExpr &rhs);
 
@@ -52,6 +57,7 @@ protected:
 		int16_t			i16;
 		uint8_t			ui8;
 		int8_t			i8;
+		bool			b;
 	};
 
 	val_t				m_value;
@@ -61,12 +67,17 @@ private:
 
 	virtual void do_post_randomize();
 
+	virtual void get_constraints(std::vector<Constraint *> &constraints);
+
+	virtual void get_variables(std::vector<VarBase *> &variables);
+
 private:
 	RandObj				*m_parent;
 	BoolectorNode		*m_node;
 	std::string			m_name;
 	uint32_t			m_bits;
 	bool				m_is_signed;
+	bool				m_is_rand;
 
 };
 

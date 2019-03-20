@@ -31,6 +31,20 @@ ConstraintBuilderExpr::ConstraintBuilderExpr(const VarBase &var) {
 	RandObjCtor::inst().push_constraint(m_node);
 }
 
+ConstraintBuilderExpr::ConstraintBuilderExpr(uint32_t val) {
+	RandObjCtor &ctor = RandObjCtor::inst();
+	char tmp[64];
+
+	sprintf(tmp, "%d", val);
+
+	m_node = boolector_constd(ctor.btor(),
+			boolector_bitvec_sort(ctor.btor(), 32),
+			tmp);
+	m_bits = 32;
+	m_is_signed = false;
+	RandObjCtor::inst().push_constraint(m_node);
+}
+
 ConstraintBuilderExpr::~ConstraintBuilderExpr() {
 	fprintf(stdout, "~ConstraintBuilderExpr: %p\n", this);
 	// TODO Auto-generated destructor stub
@@ -43,7 +57,15 @@ ConstraintBuilderExpr ConstraintBuilderExpr::operator ==(const ConstraintBuilder
 	return ConstraintBuilderExpr(0,0,0);
 }
 
+ConstraintBuilderExpr ConstraintBuilderExpr::operator !=(const ConstraintBuilderExpr &rhs) {
+	// TODO: create an == node from this node and the rhs
+	fprintf(stdout, "-- NEQ\n");
+
+	return ConstraintBuilderExpr(0,0,0);
+}
+
 ConstraintBuilderExpr ConstraintBuilderExpr::operator &&(const ConstraintBuilderExpr &rhs) {
+	fprintf(stdout, "-- AND\n");
 	return RandObjCtor::inst().push_logical_and(*this, rhs);
 }
 

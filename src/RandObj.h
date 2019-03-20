@@ -25,6 +25,7 @@ public:
 	template <typename T> friend class RandVar;
 	friend class VarBase;
 	friend class RandObjCtor;
+	friend class Constraint;
 	RandObj();
 
 	RandObj(const CtorScope &scope);
@@ -52,6 +53,10 @@ private:
 
 	virtual void do_post_randomize();
 
+	virtual void get_constraints(std::vector<Constraint *> &constraints);
+
+	virtual void get_variables(std::vector<VarBase *> &variables);
+
 	void add_child(IRandObj *c);
 
 	// Used to collect up all the variables in the system
@@ -59,18 +64,32 @@ private:
 
 	void add_constraint(Constraint *c);
 
+
+	void add_root_constraint(Constraint *c);
+
 	virtual void finalize(RandObj *root);
 
 	Btor *btor() { return m_btor; }
+
+	// Returns the next seed value
+	uint32_t next();
 
 private:
 	// handle to the parent object (or null if this is the root)
 	RandObj						*m_parent;
 
+
+	// Seed for the root object
+	uint32_t					m_seed;
+
+	uint32_t					m_depth;
+
 	Btor						*m_btor;
 	// TODO: handle to solver for this object
 
 	std::vector<VarBase *>		m_variables;
+	std::vector<Constraint *>	m_root_constraints;
+
 	std::vector<IRandObj *>		m_children;
 
 	// Collection of active constraint blocks for this type

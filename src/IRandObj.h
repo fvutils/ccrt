@@ -1,10 +1,13 @@
 
 #pragma once
 #include <string>
+#include <vector>
 
 namespace ccrt {
 
 class RandObj;
+class Constraint;
+class VarBase;
 class IRandObj {
 public:
 	friend class VarBase;
@@ -21,6 +24,10 @@ private:
 	virtual void do_pre_randomize() = 0;
 
 	virtual void do_post_randomize() = 0;
+
+	virtual void get_constraints(std::vector<Constraint *> &constraints) = 0;
+
+	virtual void get_variables(std::vector<VarBase *> &variables) = 0;
 
 };
 

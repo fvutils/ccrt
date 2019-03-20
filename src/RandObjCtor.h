@@ -37,16 +37,38 @@ public:
 			const ConstraintBuilderExpr &lhs,
 			const ConstraintBuilderExpr &rhs);
 
+	ConstraintBuilderExpr push_neq(
+			const ConstraintBuilderExpr &lhs,
+			const ConstraintBuilderExpr &rhs);
+
 	ConstraintBuilderExpr push_logical_and(
 			const ConstraintBuilderExpr &lhs,
 			const ConstraintBuilderExpr &rhs);
+
 
 	void push_constraint(BoolectorNode *c);
 	void pop_constraint(BoolectorNode *c);
 	void pop_constraint(BoolectorNode *c1, BoolectorNode *c2);
 
+	const std::vector<BoolectorNode *> &get_constraints() const {
+		return m_constraints;
+	}
+
+	void clear_constraints() {
+		m_constraints.clear();
+	}
+
 
 private:
+
+	/**
+	 * Resize two expressions to be the same size, and return the
+	 * result in lhs_r and rhs_r
+	 */
+	void resize(
+			const ConstraintBuilderExpr	&lhs,
+			const ConstraintBuilderExpr &rhs,
+			BoolectorNode **lhs_r, BoolectorNode **rhs_r);
 
 	void enter(CtorScope *scope);
 

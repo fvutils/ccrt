@@ -15,6 +15,8 @@ public:
 	// Conversion constructor
 	ConstraintBuilderExpr(const VarBase &rhs);
 
+	ConstraintBuilderExpr(uint32_t val);
+
 	ConstraintBuilderExpr(
 			BoolectorNode		*node,
 			uint32_t			bits,
@@ -30,6 +32,8 @@ public:
 	bool is_signed() const { return m_is_signed; }
 
 	ConstraintBuilderExpr operator == (const ConstraintBuilderExpr &rhs);
+
+	ConstraintBuilderExpr operator != (const ConstraintBuilderExpr &rhs);
 
 	ConstraintBuilderExpr operator && (const ConstraintBuilderExpr &rhs);
 
