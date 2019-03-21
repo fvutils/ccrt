@@ -41,17 +41,17 @@ public:
 		return m_value.ui8;
 	}
 
-	ConstraintBuilderExpr operator == (const ConstraintBuilderExpr &rhs) {
-		return VarBase::operator == (rhs);
-	}
-
-	ConstraintBuilderExpr operator != (const ConstraintBuilderExpr &rhs) {
-		return VarBase::operator != (rhs);
-	}
-
-	ConstraintBuilderExpr operator && (const ConstraintBuilderExpr &rhs) {
-		return VarBase::operator && (rhs);
-	}
+//	ConstraintBuilderExpr operator == (const ConstraintBuilderExpr &rhs) {
+//		return VarBase::operator == (rhs);
+//	}
+//
+//	ConstraintBuilderExpr operator != (const ConstraintBuilderExpr &rhs) {
+//		return VarBase::operator != (rhs);
+//	}
+//
+//	ConstraintBuilderExpr operator && (const ConstraintBuilderExpr &rhs) {
+//		return VarBase::operator && (rhs);
+//	}
 
 //	bool operator == (const VarBase &rhs) {
 //		return RandObjCtor::mkEq(*this, rhs);

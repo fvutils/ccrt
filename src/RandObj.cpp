@@ -122,6 +122,8 @@ bool RandObj::do_randomize() {
 		m_depth = 0;
 	}
 
+	boolector_set_opt(btor(), BTOR_OPT_SEED, next());
+
 	// Push a context for just this solve
 	boolector_push(btor(), 1);
 	m_depth++;
@@ -137,16 +139,21 @@ bool RandObj::do_randomize() {
 
 	do_pre_randomize();
 
+	int32_t bits = -1;
+	int32_t tries = 0;
 
 	// TODO: loop trying to find a randomize
-	for (int i=0; i<1000; i++) {
+	for (int i=0; i<10000; i++) {
 		boolector_push(btor(), 1);
 		m_depth++;
+		tries++;
 
 		BoolectorNode *sum_node = 0;
 		BoolectorNode *slice = 0;
 
-		// TODO: form a sum
+		uint32_t total_bits = 0;
+
+		if (bits != 0) {
 		for (std::vector<VarBase *>::iterator it=variables.begin();
 				it!=variables.end(); it++) {
 			if ((*it)->is_rand()) {
@@ -155,6 +162,8 @@ bool RandObj::do_randomize() {
 				uint32_t coeff = (next() & 0x0FFFFFFF);
 
 				sprintf(tmp, "%d", coeff);
+
+				total_bits += (*it)->bits();
 
 				if ((*it)->bits() < 64) {
 					if ((*it)->is_signed()) {
@@ -174,16 +183,22 @@ bool RandObj::do_randomize() {
 				} else {
 					sum_node = n;
 				}
+			}
+		}
+		}
 
-				// TODO:
-//				break;
+		if (bits == -1) {
+			// Initialize based on total_bits
+			if (total_bits > 10) {
+				bits = 10;
+			} else {
+				bits = total_bits;
 			}
 		}
 
 		if (sum_node) {
 			char tmp[64];
 			// TODO: fix this equation a bit better
-			uint32_t bits = 8;
 			uint32_t seed = (next() & ((1 << bits)-1));
 			sprintf(tmp, "%d", seed);
 
@@ -195,13 +210,11 @@ bool RandObj::do_randomize() {
 
 			// Extrace certain bits
 			boolector_assert(btor(), eq_node);
-		} else {
-			fprintf(stdout, "Error: no sum_node\n");
 		}
 
-		int32_t sat = boolector_sat(m_btor);
+		boolector_simplify(btor());
 
-		fprintf(stdout, "--> do_randomize\n");
+		int32_t sat = boolector_sat(m_btor);
 
 		if (sat == BOOLECTOR_SAT) {
 			fprintf(stdout, "SAT\n");
@@ -212,23 +225,32 @@ bool RandObj::do_randomize() {
 
 			break;
 		} else {
-			// Go back around and try again
-			if (sat == BOOLECTOR_UNSAT) {
-				fprintf(stdout, "UNSAT\n");
-			} else {
-				fprintf(stdout, "sat=%d\n", sat);
+			if (bits > 0) {
+				bits--;
 			}
+
+			// Go back around and try again
+//			if (sat == BOOLECTOR_UNSAT) {
+//				fprintf(stdout, "UNSAT\n");
+//			} else {
+//				fprintf(stdout, "sat=%d\n", sat);
+//			}
 		}
 
 		boolector_pop(btor(), 1);
 		m_depth--;
 	}
 
+	if (ret) {
+		if (tries > 1) {
+			fprintf(stdout, "SAT after %d tries\n", tries);
+		}
+	} else {
+		fprintf(stdout, "UNSAT after %d tries\n", tries);
+	}
+
 //	boolector_pop(btor(), 1);
 //	m_depth--;
-
-	fprintf(stdout, "<-- do_randomize\n");
-
 
 	return ret;
 }
