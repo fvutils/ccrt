@@ -10,7 +10,10 @@ namespace ccrt {
 class ConstraintStmt {
 public:
 	ConstraintStmt();
+
 	virtual ~ConstraintStmt();
+
+
 };
 
 }

@@ -69,77 +69,112 @@ RandObj *RandObjCtor::parent() const {
 ConstraintBuilderExpr RandObjCtor::push_eq(
 		const ConstraintBuilderExpr		&lhs,
 		const ConstraintBuilderExpr		&rhs) {
-	BoolectorNode *n0, *n1;
-
-	resize(lhs, rhs, &n0, &n1);
-
-	fprintf(stdout, "--> n1\n");
-	boolector_dump_btor_node(btor(), stdout, n1);
-	fprintf(stdout, "<-- n1\n");
-
-	BoolectorNode *eq = boolector_eq(
-			btor(),
-			n0,
-			n1);
-
-	pop_constraint(lhs.node(), rhs.node());
-
-	// Equal is always unsigned and 1-bit wide
-	return ConstraintBuilderExpr(eq, 1, false);
+//	BoolectorNode *n0, *n1;
+//
+//	resize(lhs, rhs, &n0, &n1);
+//
+//	fprintf(stdout, "--> n1\n");
+//	boolector_dump_btor_node(btor(), stdout, n1);
+//	fprintf(stdout, "<-- n1\n");
+//
+//	BoolectorNode *eq = boolector_eq(
+//			btor(),
+//			n0,
+//			n1);
+//
+//	pop_constraint(lhs.node(), rhs.node());
+//
+//	// Equal is always unsigned and 1-bit wide
+//	return ConstraintBuilderExpr(eq, 1, false);
 }
 
 ConstraintBuilderExpr RandObjCtor::push_neq(
 		const ConstraintBuilderExpr		&lhs,
 		const ConstraintBuilderExpr		&rhs) {
-	BoolectorNode *n0, *n1;
-
-	resize(lhs, rhs, &n0, &n1);
-
-	fprintf(stdout, "--> n0\n");
-	boolector_dump_btor_node(btor(), stdout, n0);
-	fprintf(stdout, "<-- n0\n");
-	fprintf(stdout, "--> n1\n");
-	boolector_dump_btor_node(btor(), stdout, n1);
-	fprintf(stdout, "<-- n1\n");
-
-	BoolectorNode *neq = boolector_not(btor(),
-			boolector_eq(
-					btor(),
-					n0,
-					n1));
-
-	pop_constraint(lhs.node(), rhs.node());
-
-	// Equal is always unsigned and 1-bit wide
-	return ConstraintBuilderExpr(neq, 1, false);
+//	BoolectorNode *n0, *n1;
+//
+//	resize(lhs, rhs, &n0, &n1);
+//
+//	fprintf(stdout, "--> n0\n");
+//	boolector_dump_btor_node(btor(), stdout, n0);
+//	fprintf(stdout, "<-- n0\n");
+//	fprintf(stdout, "--> n1\n");
+//	boolector_dump_btor_node(btor(), stdout, n1);
+//	fprintf(stdout, "<-- n1\n");
+//
+//	BoolectorNode *neq = boolector_not(btor(),
+//			boolector_eq(
+//					btor(),
+//					n0,
+//					n1));
+//
+//	pop_constraint(lhs.node(), rhs.node());
+//
+//	// Equal is always unsigned and 1-bit wide
+//	return ConstraintBuilderExpr(neq, 1, false);
 }
+
+ConstraintBuilderExpr RandObjCtor::push_plus(
+		const ConstraintBuilderExpr		&lhs,
+		const ConstraintBuilderExpr		&rhs) {
+//	BoolectorNode *n0, *n1;
+//
+//	resize(lhs, rhs, &n0, &n1);
+//
+//	BoolectorNode *plus = boolector_add(btor(), n0, n1);
+//
+//	pop_constraint(lhs.node(), rhs.node());
+//
+//	// Equal is always unsigned and 1-bit wide
+//	return ConstraintBuilderExpr(plus,
+//			boolector_get_width(btor(), n0),
+//			false); // TODO:
+}
+
+ConstraintBuilderExpr RandObjCtor::push_minus(
+		const ConstraintBuilderExpr		&lhs,
+		const ConstraintBuilderExpr		&rhs) {
+//	BoolectorNode *n0, *n1;
+//
+//	resize(lhs, rhs, &n0, &n1);
+//
+//	BoolectorNode *minus = boolector_sub(btor(), n0, n1);
+//
+//	pop_constraint(lhs.node(), rhs.node());
+//
+//	// Equal is always unsigned and 1-bit wide
+//	return ConstraintBuilderExpr(minus,
+//			boolector_get_width(btor(), n0),
+//			false); // TODO:
+}
+
 
 ConstraintBuilderExpr RandObjCtor::push_logical_and(
 		const ConstraintBuilderExpr		&lhs,
 		const ConstraintBuilderExpr		&rhs) {
-	fprintf(stdout, "push_logical_and\n");
-	BoolectorNode *n0, *n1;
-
-	if (lhs.bits() == 1) {
-		n0 = lhs.node();
-	} else {
-		n0 = boolector_ne(btor(), n0,
-				boolector_zero(btor(),
-						boolector_get_sort(btor(), lhs.node())));
-	}
-
-	if (rhs.bits() == 1) {
-		n1 = rhs.node();
-	} else {
-		n1 = boolector_ne(btor(), n1,
-				boolector_zero(btor(),
-						boolector_get_sort(btor(), rhs.node())));
-	}
-
-	BoolectorNode *n_and = boolector_and(btor(), n0, n1);
-	pop_constraint(lhs.node(), rhs.node());
-
-	return ConstraintBuilderExpr(n_and, 1, false);
+//	fprintf(stdout, "push_logical_and\n");
+//	BoolectorNode *n0, *n1;
+//
+//	if (lhs.bits() == 1) {
+//		n0 = lhs.node();
+//	} else {
+//		n0 = boolector_ne(btor(), n0,
+//				boolector_zero(btor(),
+//						boolector_get_sort(btor(), lhs.node())));
+//	}
+//
+//	if (rhs.bits() == 1) {
+//		n1 = rhs.node();
+//	} else {
+//		n1 = boolector_ne(btor(), n1,
+//				boolector_zero(btor(),
+//						boolector_get_sort(btor(), rhs.node())));
+//	}
+//
+//	BoolectorNode *n_and = boolector_and(btor(), n0, n1);
+//	pop_constraint(lhs.node(), rhs.node());
+//
+//	return ConstraintBuilderExpr(n_and, 1, false);
 }
 
 void RandObjCtor::resize(
@@ -147,34 +182,34 @@ void RandObjCtor::resize(
 		const ConstraintBuilderExpr		&rhs,
 		BoolectorNode 					**lhs_r,
 		BoolectorNode 					**rhs_r) {
-	*lhs_r = lhs.node();
-	*rhs_r = rhs.node();
-
-	if (lhs.bits() > rhs.bits()) {
-		if (rhs.is_signed()) {
-			*rhs_r = boolector_sext(
-					btor(),
-					rhs.node(),
-					(lhs.bits()-rhs.bits()));
-		} else {
-			*rhs_r = boolector_uext(
-					btor(),
-					rhs.node(),
-					(lhs.bits()-rhs.bits()));
-		}
-	} else if (rhs.bits() > lhs.bits()) {
-		if (lhs.is_signed()) {
-			*lhs_r = boolector_sext(
-					btor(),
-					lhs.node(),
-					(rhs.bits()-lhs.bits()));
-		} else {
-			*lhs_r = boolector_uext(
-					btor(),
-					lhs.node(),
-					(rhs.bits()-lhs.bits()));
-		}
-	}
+//	*lhs_r = lhs.node();
+//	*rhs_r = rhs.node();
+//
+//	if (lhs.bits() > rhs.bits()) {
+//		if (rhs.is_signed()) {
+//			*rhs_r = boolector_sext(
+//					btor(),
+//					rhs.node(),
+//					(lhs.bits()-rhs.bits()));
+//		} else {
+//			*rhs_r = boolector_uext(
+//					btor(),
+//					rhs.node(),
+//					(lhs.bits()-rhs.bits()));
+//		}
+//	} else if (rhs.bits() > lhs.bits()) {
+//		if (lhs.is_signed()) {
+//			*lhs_r = boolector_sext(
+//					btor(),
+//					lhs.node(),
+//					(rhs.bits()-lhs.bits()));
+//		} else {
+//			*lhs_r = boolector_uext(
+//					btor(),
+//					lhs.node(),
+//					(rhs.bits()-lhs.bits()));
+//		}
+//	}
 }
 
 void RandObjCtor::push_constraint(BoolectorNode *c) {
@@ -212,6 +247,23 @@ void RandObjCtor::pop_constraint(BoolectorNode *c1, BoolectorNode *c2) {
 	} else {
 		fprintf(stdout, "Error: need 2 constraints to pop, but have %d\n",
 				m_constraints.size());
+	}
+}
+
+void RandObjCtor::push_expr(IExpr *expr) {
+	fprintf(stdout, "push_expr\n");
+	m_expressions.push_back(expr);
+}
+
+IExpr *RandObjCtor::pop_expr() {
+	fprintf(stdout, "pop_expr\n");
+	if (m_expressions.size() > 0) {
+		IExpr *ret = m_expressions.back();
+		m_expressions.pop_back();
+		return ret;
+	} else {
+		fprintf(stdout, "Error: pop_expr() called with no expressions\n");
+		return 0;
 	}
 }
 

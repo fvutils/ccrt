@@ -6,6 +6,7 @@
  */
 #pragma once
 #include "IRandObj.h"
+#include "Value.h"
 #include <stdint.h>
 #include <string>
 #include "boolector/boolector.h"
@@ -37,30 +38,26 @@ public:
 
 	bool is_rand() const { return m_is_rand; }
 
+	const Value &value() const { return m_value; }
+
+	void value(const Value &v);
+
 	virtual void finalize(RandObj *root);
 
-	ConstraintBuilderExpr operator ()();
+//	ConstraintBuilderExpr operator ()();
 
 	ConstraintBuilderExpr operator == (const ConstraintBuilderExpr &rhs);
 
 	ConstraintBuilderExpr operator != (const ConstraintBuilderExpr &rhs);
 
+	ConstraintBuilderExpr operator + (const ConstraintBuilderExpr &rhs);
+
+	ConstraintBuilderExpr operator - (const ConstraintBuilderExpr &rhs);
+
 	ConstraintBuilderExpr operator && (const ConstraintBuilderExpr &rhs);
 
 protected:
-	union val_t {
-		uint64_t		ui64;
-		int64_t			i64;
-		uint32_t		ui32;
-		int32_t			i32;
-		uint16_t		ui16;
-		int16_t			i16;
-		uint8_t			ui8;
-		int8_t			i8;
-		bool			b;
-	};
-
-	val_t				m_value;
+	Value				m_value;
 
 private:
 	virtual void do_pre_randomize();

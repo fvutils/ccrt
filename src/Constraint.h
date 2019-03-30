@@ -24,12 +24,17 @@ public:
 		return m_constraints;
 	}
 
+	void constraint_mode(bool mode);
+
+	bool constraint_mode() const { return m_constraint_mode; }
+
 	void finalize();
 
 private:
 	std::function<void ()> 					m_func;
 	std::string								m_name;
 	std::vector<BoolectorNode *>			m_constraints;
+	bool									m_constraint_mode;
 
 };
 

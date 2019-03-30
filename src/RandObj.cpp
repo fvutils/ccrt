@@ -25,6 +25,7 @@ RandObj::RandObj() {
 	if (parent) {
 		// Find the root
 		m_parent = parent;
+		m_parent->add_child(this);
 
 		while (parent->m_parent) {
 			parent = parent->m_parent;
@@ -55,10 +56,15 @@ RandObj::RandObj(const CtorScope &scope) {
 
 	// TODO: need to figure out exactly what the scope is
 	RandObj *parent = obj_ctor.parent();
+	RandObj *this_s = obj_ctor.scope();
+
+	fprintf(stdout, "RandObj(2): %s this=%p this_s=%p parent=%p\n",
+			scope.name().c_str(), this, this_s, parent);
 
 	if (parent) {
 		// Find the root
 		m_parent = parent;
+		m_parent->add_child(this);
 
 		while (parent->m_parent) {
 			parent = parent->m_parent;
@@ -131,9 +137,11 @@ bool RandObj::do_randomize() {
 	// Add collected constraints to the solver
 	for (std::vector<Constraint *>::iterator it=constraints.begin();
 			it!=constraints.end(); it++) {
+		if ((*it)->constraint_mode()) {
 		for (std::vector<BoolectorNode *>::const_iterator n=(*it)->constraints().begin();
 				n != (*it)->constraints().end(); n++) {
 			boolector_assert(btor(), *n);
+		}
 		}
 	}
 
@@ -141,6 +149,14 @@ bool RandObj::do_randomize() {
 
 	int32_t bits = -1;
 	int32_t tries = 0;
+
+	// First check to see that the system is actually valid
+	int32_t sat = boolector_sat(m_btor);
+
+	if (sat != BOOLECTOR_SAT) {
+		fprintf(stdout, "Constraints are not satisfiable\n");
+		return false;
+	}
 
 	// TODO: loop trying to find a randomize
 	for (int i=0; i<10000; i++) {
@@ -157,11 +173,16 @@ bool RandObj::do_randomize() {
 		for (std::vector<VarBase *>::iterator it=variables.begin();
 				it!=variables.end(); it++) {
 			if ((*it)->is_rand()) {
+				char tmp[65];
 				BoolectorNode *n = (*it)->node();
-				char tmp[64];
-				uint32_t coeff = (next() & 0x0FFFFFFF);
 
-				sprintf(tmp, "%d", coeff);
+//				uint64_t coeff = (next() & 0xFFFFFFFF);
+				uint64_t coeff = next();
+
+				for (uint32_t j=0; j<64; j++) {
+					tmp[64-j-1] = (coeff & (j<<i))?'1':'0';
+				}
+				tmp[64] = 0;
 
 				total_bits += (*it)->bits();
 
@@ -173,8 +194,7 @@ bool RandObj::do_randomize() {
 					}
 				}
 				n = boolector_mul(btor(), n,
-						boolector_constd(btor(),
-								boolector_bitvec_sort(btor(), 64), tmp));
+						boolector_const(btor(), tmp));
 
 				if (sum_node) {
 					sum_node = boolector_add(btor(),
@@ -197,16 +217,19 @@ bool RandObj::do_randomize() {
 		}
 
 		if (sum_node) {
-			char tmp[64];
+			char tmp[65];
 			// TODO: fix this equation a bit better
 			uint32_t seed = (next() & ((1 << bits)-1));
-			sprintf(tmp, "%d", seed);
+
+			for (uint32_t j=0; j<bits; j++) {
+				tmp[bits-j-1] = (seed & (1<<j))?'1':'0';
+			}
+			tmp[bits] = 0;
 
 			slice = boolector_slice(btor(), sum_node, bits-1, 0);
 
 			BoolectorNode *eq_node = boolector_eq(btor(), slice,
-					boolector_constd(btor(),
-							boolector_bitvec_sort(btor(), bits), tmp));
+					boolector_const(btor(), tmp));
 
 			// Extrace certain bits
 			boolector_assert(btor(), eq_node);
@@ -225,7 +248,7 @@ bool RandObj::do_randomize() {
 
 			break;
 		} else {
-			if (bits > 0) {
+			if (bits > 1) {
 				bits--;
 			}
 
@@ -246,7 +269,10 @@ bool RandObj::do_randomize() {
 			fprintf(stdout, "SAT after %d tries\n", tries);
 		}
 	} else {
-		fprintf(stdout, "UNSAT after %d tries\n", tries);
+		// Go back to the original non-rand result
+		fprintf(stdout, "Warning: UNSAT after %d tries\n", tries);
+		boolector_sat(m_btor);
+		ret = true;
 	}
 
 //	boolector_pop(btor(), 1);
@@ -266,6 +292,7 @@ void RandObj::do_pre_randomize() {
 void RandObj::do_post_randomize() {
 	post_randomize();
 
+	fprintf(stdout, "[RandObj] do_post_randomize %p\n", this);
 	for (std::vector<IRandObj *>::iterator it=m_children.begin();
 			it != m_children.end(); it++) {
 		(*it)->do_post_randomize();

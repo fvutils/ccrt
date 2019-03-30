@@ -31,6 +31,33 @@ private:
 
 // TODO: Can we create a template for RandObj ?
 
+template <> class RandVar<bool> : public VarBase {
+public:
+
+	RandVar(const std::string &name=RandObjCtor::auto_name()) : VarBase(name, 1, false, true) { }
+
+	bool operator ()() {
+		// TODO: need to map value over?
+		return m_value.val.b;
+	}
+
+//	ConstraintBuilderExpr operator == (const ConstraintBuilderExpr &rhs) {
+//		return VarBase::operator == (rhs);
+//	}
+//
+//	ConstraintBuilderExpr operator != (const ConstraintBuilderExpr &rhs) {
+//		return VarBase::operator != (rhs);
+//	}
+//
+//	ConstraintBuilderExpr operator && (const ConstraintBuilderExpr &rhs) {
+//		return VarBase::operator && (rhs);
+//	}
+
+//	bool operator == (const VarBase &rhs) {
+//		return RandObjCtor::mkEq(*this, rhs);
+//	}
+};
+
 template <> class RandVar<uint8_t> : public VarBase {
 public:
 
@@ -38,7 +65,7 @@ public:
 
 	uint8_t operator ()() {
 		// TODO: need to map value over?
-		return m_value.ui8;
+		return m_value.val.u8;
 	}
 
 //	ConstraintBuilderExpr operator == (const ConstraintBuilderExpr &rhs) {
@@ -65,7 +92,7 @@ public:
 
 	int8_t operator ()() {
 		// TODO: need to map value over?
-		return m_value.i8;
+		return m_value.val.s8;
 	}
 };
 
@@ -76,7 +103,7 @@ public:
 
 	uint16_t operator ()() {
 		// TODO: need to map value over?
-		return m_value.ui16;
+		return m_value.val.u16;
 	}
 };
 
@@ -88,7 +115,7 @@ public:
 
 	uint32_t operator ()() {
 		// TODO: need to map value over?
-		return m_value.ui32;
+		return m_value.val.u32;
 	}
 
 };
@@ -101,7 +128,7 @@ public:
 
 	int32_t operator ()() {
 		// TODO: need to map value over?
-		return m_value.i32;
+		return m_value.val.s32;
 	}
 
 };
@@ -113,7 +140,7 @@ public:
 
 	uint64_t operator ()() {
 		// TODO: need to map value over?
-		return m_value.ui64;
+		return m_value.val.u64;
 	}
 };
 
@@ -125,7 +152,7 @@ public:
 
 	int64_t operator ()() {
 		// TODO: need to map value over?
-		return m_value.i64;
+		return m_value.val.s64;
 	}
 };
 

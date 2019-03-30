@@ -8,10 +8,12 @@
 #include "CtorScope.h"
 #include "RandObjCtor.h"
 #include "RandObj.h"
+#include <stdio.h>
 
 namespace ccrt {
 
 CtorScope::CtorScope(const char *name) {
+	fprintf(stdout, "CtorScope: name=%s\n", name);
 	init(name, 0, 0);
 }
 
@@ -24,7 +26,7 @@ void CtorScope::init(
 		const char 				*name,
 		const std::type_info 	*ti,
 		RandObj					*scope) {
-	m_name = (name)?name:"";
+	m_name = (name)?name:"name-null";
 	m_typeinfo = ti;
 	m_scope = scope;
 

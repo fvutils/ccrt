@@ -5,7 +5,9 @@
  *      Author: ballance
  */
 #pragma once
+#include <memory>
 #include "boolector/boolector.h"
+#include "IExpr.h"
 
 namespace ccrt {
 class VarBase;
@@ -17,30 +19,28 @@ public:
 
 	ConstraintBuilderExpr(uint32_t val);
 
-	ConstraintBuilderExpr(
-			BoolectorNode		*node,
-			uint32_t			bits,
-			bool				is_signed
-			);
+	ConstraintBuilderExpr(IExpr *expr);
 
 	virtual ~ConstraintBuilderExpr();
 
-	BoolectorNode *node() const { return m_node; }
+	IExpr *expr() const { return m_expr; }
 
-	uint32_t bits() const { return m_bits; }
+	uint32_t bits() const { return m_expr->bits(); }
 
-	bool is_signed() const { return m_is_signed; }
+	bool is_signed() const { return m_expr->is_signed(); }
 
 	ConstraintBuilderExpr operator == (const ConstraintBuilderExpr &rhs);
 
 	ConstraintBuilderExpr operator != (const ConstraintBuilderExpr &rhs);
 
+	ConstraintBuilderExpr operator + (const ConstraintBuilderExpr &rhs);
+
+	ConstraintBuilderExpr operator - (const ConstraintBuilderExpr &rhs);
+
 	ConstraintBuilderExpr operator && (const ConstraintBuilderExpr &rhs);
 
 private:
-	BoolectorNode		*m_node;
-	uint32_t			m_bits;
-	bool				m_is_signed;
+	IExpr						*m_expr;
 
 };
 
