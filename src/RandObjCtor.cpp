@@ -213,7 +213,6 @@ void RandObjCtor::resize(
 }
 
 void RandObjCtor::push_constraint(BoolectorNode *c) {
-	fprintf(stdout, "push_constraint %p\n", c);
 	m_constraints.push_back(c);
 }
 
@@ -251,12 +250,10 @@ void RandObjCtor::pop_constraint(BoolectorNode *c1, BoolectorNode *c2) {
 }
 
 void RandObjCtor::push_expr(IExpr *expr) {
-	fprintf(stdout, "push_expr\n");
 	m_expressions.push_back(expr);
 }
 
 IExpr *RandObjCtor::pop_expr() {
-	fprintf(stdout, "pop_expr\n");
 	if (m_expressions.size() > 0) {
 		IExpr *ret = m_expressions.back();
 		m_expressions.pop_back();

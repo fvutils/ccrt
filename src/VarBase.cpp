@@ -21,14 +21,11 @@ VarBase::VarBase(
 				m_is_signed(is_signed), m_is_rand(is_rand) {
 	RandObjCtor &obj_ctor = RandObjCtor::inst();
 
-	fprintf(stdout, "VarBase: %p\n", obj_ctor.scope());
-
 	m_parent = obj_ctor.scope();
 
 	Btor *btor = obj_ctor.scope()->btor();
 	BoolectorSort sort = boolector_bitvec_sort(btor, bits);
 	m_node = boolector_var(btor, sort, name.c_str());
-	fprintf(stdout, "Var %s: node=%p\n", name.c_str(), m_node);
 
 	if (obj_ctor.scope()) {
 		obj_ctor.scope()->add_child(this);
@@ -84,7 +81,6 @@ ConstraintBuilderExpr VarBase::operator == (const ConstraintBuilderExpr &rhs) {
 ConstraintBuilderExpr VarBase::operator != (const ConstraintBuilderExpr &rhs) {
 	RandObjCtor::inst().pop_expr();
 
-	fprintf(stdout, "VarBase: NEQ\n");
 	IExpr *expr = new ExprBinaryOp(
 					new ExprVarRef(this),
 					ExprBinaryOp::BinOp_Neq,
@@ -114,11 +110,21 @@ ConstraintBuilderExpr VarBase::operator - (const ConstraintBuilderExpr &rhs) {
 ConstraintBuilderExpr VarBase::operator && (const ConstraintBuilderExpr &rhs) {
 	RandObjCtor::inst().pop_expr();
 
-	fprintf(stdout, "VarBase: AND\n");
 
 	return ConstraintBuilderExpr(new ExprBinaryOp(
 					new ExprVarRef(this),
 					ExprBinaryOp::BinOp_AndAnd,
+					rhs.expr()));
+}
+
+ConstraintBuilderExpr VarBase::operator < (const ConstraintBuilderExpr &rhs) {
+	RandObjCtor::inst().pop_expr();
+
+	fprintf(stdout, "VarBase: LT\n");
+
+	return ConstraintBuilderExpr(new ExprBinaryOp(
+					new ExprVarRef(this),
+					ExprBinaryOp::BinOp_Lt,
 					rhs.expr()));
 }
 
@@ -128,10 +134,6 @@ void VarBase::do_pre_randomize() {
 
 void VarBase::do_post_randomize() {
 	const char *val = boolector_bv_assignment(m_parent->btor(), m_node);
-
-	fprintf(stdout, "[VarBase] do_post_randomize %p\n", this);
-
-	fprintf(stdout, "d_post_randomize var %s=%s\n", m_name.c_str(), val);
 
 	m_value.val.u64 = 0;
 

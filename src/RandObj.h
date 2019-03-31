@@ -97,6 +97,8 @@ private:
 	// so we can iteratively 'kick out' overridden constraints
 	std::vector<Constraint *>	m_constraints;
 
+	bool						m_debug;
+
 };
 
 } /* namespace ccrt */

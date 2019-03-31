@@ -56,6 +56,8 @@ public:
 
 	ConstraintBuilderExpr operator && (const ConstraintBuilderExpr &rhs);
 
+	ConstraintBuilderExpr operator < (const ConstraintBuilderExpr &rhs);
+
 protected:
 	Value				m_value;
 

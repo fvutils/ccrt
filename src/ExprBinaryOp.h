@@ -21,7 +21,8 @@ public:
 		BinOp_Mod,
 		BinOp_Eq,
 		BinOp_Neq,
-		BinOp_AndAnd
+		BinOp_AndAnd,
+		BinOp_Lt
 	};
 public:
 	ExprBinaryOp(

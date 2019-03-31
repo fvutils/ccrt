@@ -31,9 +31,6 @@ void ExprBase::resize(
 	// TODO: need to figure out sign resolution
 	*is_signed = (v1->is_signed() && v2->is_signed());
 
-	fprintf(stdout, "resize: v1.bits=%d v2.bits=%d\n",
-			v1->bits(), v2->bits());
-
 	if (v1->bits() > v2->bits()) {
 		if (v2->is_signed()) {
 			*v2_n = boolector_sext(

@@ -21,6 +21,7 @@ ExprBinaryOp::ExprBinaryOp(
 	// Boolean operations
 	case BinOp_Eq:
 	case BinOp_Neq:
+	case BinOp_Lt:
 		m_bits = 1;
 		break;
 
@@ -122,6 +123,14 @@ BoolectorNode *ExprBinaryOp::build_constraint(Btor *btor) {
 
 	case BinOp_Neq:
 		ret = boolector_not(btor, boolector_eq(btor, lhs_n, rhs_n));
+		break;
+
+	case BinOp_Lt:
+		if (is_signed) {
+			ret = boolector_slt(btor, lhs_n, rhs_n);
+		} else {
+			ret = boolector_ult(btor, lhs_n, rhs_n);
+		}
 		break;
 
 	default:

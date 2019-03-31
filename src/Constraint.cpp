@@ -34,13 +34,9 @@ void Constraint::finalize() {
 	for (std::vector<IExpr *>::const_iterator it=expr.begin();
 			it!=expr.end(); it++) {
 		BoolectorNode *c = (*it)->build_constraint(ctor.btor());
-		fprintf(stdout, "Constraint: %p\n", c);
 		m_constraints.push_back(c);
 	}
 	ctor.clear_expr();
-
-	fprintf(stdout, "Constraint: %s -- %d statements\n",
-			m_name.c_str(), m_constraints.size());
 }
 
 Constraint::~Constraint() {

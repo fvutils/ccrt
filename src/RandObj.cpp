@@ -12,7 +12,7 @@
 
 namespace ccrt {
 
-RandObj::RandObj() {
+RandObj::RandObj() : m_debug(false) {
 	RandObjCtor &obj_ctor = RandObjCtor::inst();
 
 	// TODO: must decide the parent
@@ -20,7 +20,6 @@ RandObj::RandObj() {
 	// TODO: if there is a parent, add this to the parent
 
 	RandObj *parent = obj_ctor.scope();
-	fprintf(stdout, "RandObj: this=%p parent=%p\n", this, parent);
 
 	if (parent) {
 		// Find the root
@@ -40,7 +39,9 @@ RandObj::RandObj() {
 		boolector_set_opt(m_btor, BTOR_OPT_MODEL_GEN, 1);
 		boolector_set_opt(m_btor, BTOR_OPT_INCREMENTAL, 1);
 
-		fprintf(stdout, "Note: top-level variable ready to go\n");
+		if (m_debug) {
+			fprintf(stdout, "Note: top-level variable ready to go\n");
+		}
 	}
 
 	m_seed = 1;
@@ -48,7 +49,7 @@ RandObj::RandObj() {
 }
 
 
-RandObj::RandObj(const CtorScope &scope) {
+RandObj::RandObj(const CtorScope &scope) : m_debug(false) {
 	RandObjCtor &obj_ctor = RandObjCtor::inst();
 
 	m_seed = 1;
@@ -154,7 +155,9 @@ bool RandObj::do_randomize() {
 	int32_t sat = boolector_sat(m_btor);
 
 	if (sat != BOOLECTOR_SAT) {
-		fprintf(stdout, "Constraints are not satisfiable\n");
+		if (m_debug) {
+			fprintf(stdout, "Constraints are not satisfiable\n");
+		}
 		return false;
 	}
 
@@ -240,7 +243,9 @@ bool RandObj::do_randomize() {
 		int32_t sat = boolector_sat(m_btor);
 
 		if (sat == BOOLECTOR_SAT) {
-			fprintf(stdout, "SAT\n");
+			if (m_debug) {
+				fprintf(stdout, "SAT\n");
+			}
 			ret = true;
 
 			// Only call post-randomize if randomization succeeds
@@ -248,16 +253,10 @@ bool RandObj::do_randomize() {
 
 			break;
 		} else {
+			// Go back around and try again, but with fewer rand bits
 			if (bits > 1) {
 				bits--;
 			}
-
-			// Go back around and try again
-//			if (sat == BOOLECTOR_UNSAT) {
-//				fprintf(stdout, "UNSAT\n");
-//			} else {
-//				fprintf(stdout, "sat=%d\n", sat);
-//			}
 		}
 
 		boolector_pop(btor(), 1);
@@ -265,12 +264,14 @@ bool RandObj::do_randomize() {
 	}
 
 	if (ret) {
-		if (tries > 1) {
+		if (tries > 1 && m_debug) {
 			fprintf(stdout, "SAT after %d tries\n", tries);
 		}
 	} else {
 		// Go back to the original non-rand result
-		fprintf(stdout, "Warning: UNSAT after %d tries\n", tries);
+		if (m_debug) {
+			fprintf(stdout, "Warning: UNSAT after %d tries\n", tries);
+		}
 		boolector_sat(m_btor);
 		ret = true;
 	}
@@ -292,7 +293,6 @@ void RandObj::do_pre_randomize() {
 void RandObj::do_post_randomize() {
 	post_randomize();
 
-	fprintf(stdout, "[RandObj] do_post_randomize %p\n", this);
 	for (std::vector<IRandObj *>::iterator it=m_children.begin();
 			it != m_children.end(); it++) {
 		(*it)->do_post_randomize();
@@ -328,9 +328,6 @@ void RandObj::add_variable(VarBase *var) {
 }
 
 void RandObj::add_constraint(Constraint *c) {
-	fprintf(stdout, "Note: add constraint %s with %d constraints\n",
-			c->name().c_str(), c->constraints().size());
-
 	std::vector<Constraint *>::iterator it = m_constraints.begin();
 
 	uint32_t i=0;

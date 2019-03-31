@@ -15,38 +15,20 @@
 namespace ccrt {
 
 ConstraintBuilderExpr::ConstraintBuilderExpr(IExpr *expr) : m_expr(expr) {
-	fprintf(stdout, "ConstraintBuilderExpr: %p\n", this);
 	RandObjCtor::inst().push_expr(m_expr);
-//	RandObjCtor::inst().push_constraint(node);
 }
 
 ConstraintBuilderExpr::ConstraintBuilderExpr(const VarBase &var) :
 		m_expr(new ExprVarRef(&var)) {
-	fprintf(stdout, "ConstraintBuilderExpr(var): %p\n", this);
 	RandObjCtor::inst().push_expr(m_expr);
-//	RandObjCtor::inst().push_constraint(m_node);
 }
 
 ConstraintBuilderExpr::ConstraintBuilderExpr(uint32_t val) :
 		m_expr(new ExprLiteral(val, 32, false)) {
 	RandObjCtor::inst().push_expr(m_expr);
-
-//	RandObjCtor &ctor = RandObjCtor::inst();
-//	char tmp[64];
-//
-//	sprintf(tmp, "%d", val);
-//
-//	m_node = boolector_constd(ctor.btor(),
-//			boolector_bitvec_sort(ctor.btor(), 32),
-//			tmp);
-//	m_bits = 32;
-//	m_is_signed = false;
-//	RandObjCtor::inst().push_constraint(m_node);
 }
 
 ConstraintBuilderExpr::~ConstraintBuilderExpr() {
-	fprintf(stdout, "~ConstraintBuilderExpr: %p\n", this);
-	// TODO Auto-generated destructor stub
 }
 
 ConstraintBuilderExpr ConstraintBuilderExpr::operator ==(const ConstraintBuilderExpr &rhs) {
