@@ -24,6 +24,10 @@ public:
 
 protected:
 
+	virtual void bits(uint32_t bits) { m_bits = bits; }
+
+	virtual void is_signed(bool is_signed) { m_is_signed = is_signed; }
+
 	static void resize(
 			Btor			*btor,
 			IExpr			*v1,
@@ -31,6 +35,12 @@ protected:
 			BoolectorNode	**v1_n,
 			BoolectorNode	**v2_n,
 			bool			*is_signed
+			);
+
+	static void to_boolean(
+			Btor			*btor,
+			IExpr			*v,
+			BoolectorNode	**v_n
 			);
 
 protected:

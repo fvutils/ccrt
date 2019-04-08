@@ -4,7 +4,9 @@ CCRT_DIR ?= $(abspath $(VE_UNIT_DIR)/../..)
 
 include $(PACKAGES_DIR)/packages.mk
 
-CXXFLAGS += -std=c++11 -g
+CXXFLAGS += -std=c++11
+CXXFLAGS += -g
+CXXFLAGS += -O3
 
 SRC_DIRS += $(VE_UNIT_DIR)/src
 SRC_DIRS += $(CCRT_DIR)/src
@@ -14,19 +16,23 @@ UNIT_TEST_SRC_FILES = $(wildcard $(VE_UNIT_DIR)/src/*.cpp)
 UNIT_TEST_SRCS = $(notdir $(UNIT_TEST_SRC_FILES))
 CXXFLAGS += $(foreach d,$(SRC_DIRS),-I$(d))
 
+ifneq (,$(GTEST_FILTER))
+ARGS += --gtest_filter=$(GTEST_FILTER)
+endif
+
 RULES := 1
 
 all : 
 	mkdir -p build
 	$(MAKE) -C build -f $(VE_UNIT_DIR)/Makefile ve_unit
 	export LD_LIBRARY_PATH=$(CCRT_DIR)/boolector/lib:$(VE_UNIT_DIR)/build ; \
-		./build/ve_unit
+		./build/ve_unit $(ARGS)
 
 debug : 
 	mkdir -p build
 	cd build ; $(MAKE) -f $(VE_UNIT_DIR)/Makefile ve_unit
 	export LD_LIBRARY_PATH=$(CCRT_DIR)/boolector/lib:$(VE_UNIT_DIR)/build ; \
-		gdb --args ./build/ve_unit
+		gdb --args ./build/ve_unit $(ARGS)
 
 valgrind : 
 	mkdir -p build

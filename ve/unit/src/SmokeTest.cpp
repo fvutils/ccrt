@@ -6,8 +6,7 @@
  */
 
 #include "SmokeTest.h"
-#include "RandObj.h"
-#include "RandVar.h"
+#include "ccrt.h"
 
 using namespace ccrt;
 
@@ -38,7 +37,7 @@ TEST_F(SmokeTest, basic) {
 		};
 	};
 
-	RandVar<abc>			abc_i;
+	RandInst<abc>			abc_i;
 
 	for (int i=0; i<10; i++) {
 		ASSERT_TRUE(abc_i.randomize());

@@ -10,6 +10,7 @@
 #include "VarBase.h"
 #include "ExprVarRef.h"
 #include "ExprLiteral.h"
+#include "ExprBinaryOp.h"
 #include <stdio.h>
 
 namespace ccrt {
@@ -32,23 +33,94 @@ ConstraintBuilderExpr::~ConstraintBuilderExpr() {
 }
 
 ConstraintBuilderExpr ConstraintBuilderExpr::operator ==(const ConstraintBuilderExpr &rhs) {
-//
-//	// TODO: create an == node from this node and the rhs
-//	fprintf(stdout, "-- TODO: EQ\n");
-//
-//	return ConstraintBuilderExpr(0,0,0);
+	RandObjCtor::inst().pop_expr();
+	RandObjCtor::inst().pop_expr();
+
+	return ConstraintBuilderExpr(new ExprBinaryOp(
+					expr(),
+					ExprBinaryOp::BinOp_Eq,
+					rhs.expr()));
 }
 
 ConstraintBuilderExpr ConstraintBuilderExpr::operator !=(const ConstraintBuilderExpr &rhs) {
-	// TODO: create an == node from this node and the rhs
-//	fprintf(stdout, "-- NEQ\n");
-//
-//	return ConstraintBuilderExpr(0,0,0);
+	RandObjCtor::inst().pop_expr();
+	RandObjCtor::inst().pop_expr();
+
+	return ConstraintBuilderExpr(new ExprBinaryOp(
+					expr(),
+					ExprBinaryOp::BinOp_Neq,
+					rhs.expr()));
+}
+
+ConstraintBuilderExpr ConstraintBuilderExpr::operator + (const ConstraintBuilderExpr &rhs) {
+	RandObjCtor::inst().pop_expr();
+	RandObjCtor::inst().pop_expr();
+
+	return ConstraintBuilderExpr(new ExprBinaryOp(
+					expr(),
+					ExprBinaryOp::BinOp_Add,
+					rhs.expr()));
+}
+
+ConstraintBuilderExpr ConstraintBuilderExpr::operator - (const ConstraintBuilderExpr &rhs) {
+	RandObjCtor::inst().pop_expr();
+	RandObjCtor::inst().pop_expr();
+
+	return ConstraintBuilderExpr(new ExprBinaryOp(
+					expr(),
+					ExprBinaryOp::BinOp_Sub,
+					rhs.expr()));
 }
 
 ConstraintBuilderExpr ConstraintBuilderExpr::operator &&(const ConstraintBuilderExpr &rhs) {
-	fprintf(stdout, "-- AND\n");
-	return RandObjCtor::inst().push_logical_and(*this, rhs);
+	RandObjCtor::inst().pop_expr();
+	RandObjCtor::inst().pop_expr();
+
+	return ConstraintBuilderExpr(new ExprBinaryOp(
+					expr(),
+					ExprBinaryOp::BinOp_AndAnd,
+					rhs.expr()));
+}
+
+
+ConstraintBuilderExpr ConstraintBuilderExpr::operator < (const ConstraintBuilderExpr &rhs) {
+	RandObjCtor::inst().pop_expr();
+	RandObjCtor::inst().pop_expr();
+
+	return ConstraintBuilderExpr(new ExprBinaryOp(
+					expr(),
+					ExprBinaryOp::BinOp_Lt,
+					rhs.expr()));
+}
+
+ConstraintBuilderExpr ConstraintBuilderExpr::operator <= (const ConstraintBuilderExpr &rhs) {
+	RandObjCtor::inst().pop_expr();
+	RandObjCtor::inst().pop_expr();
+
+	return ConstraintBuilderExpr(new ExprBinaryOp(
+					expr(),
+					ExprBinaryOp::BinOp_Le,
+					rhs.expr()));
+}
+
+ConstraintBuilderExpr ConstraintBuilderExpr::operator > (const ConstraintBuilderExpr &rhs) {
+	RandObjCtor::inst().pop_expr();
+	RandObjCtor::inst().pop_expr();
+
+	return ConstraintBuilderExpr(new ExprBinaryOp(
+					expr(),
+					ExprBinaryOp::BinOp_Gt,
+					rhs.expr()));
+}
+
+ConstraintBuilderExpr ConstraintBuilderExpr::operator >= (const ConstraintBuilderExpr &rhs) {
+	RandObjCtor::inst().pop_expr();
+	RandObjCtor::inst().pop_expr();
+
+	return ConstraintBuilderExpr(new ExprBinaryOp(
+					expr(),
+					ExprBinaryOp::BinOp_Ge,
+					rhs.expr()));
 }
 
 } /* namespace ccrt */

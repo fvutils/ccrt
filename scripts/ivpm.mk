@@ -21,7 +21,8 @@ PROJECT := $(name)
 
 SRC_FILES := $(wildcard $(ROOT_DIR)/src/*.cpp)
 CXXFLAGS += -std=c++11 -I$(ROOT_DIR)/boolector/include
-CXXFLAGS += -g
+#CXXFLAGS += -g
+CXXFLAGS += -O3
 
 # Include makefiles with dependencies
 MK_INCLUDES += $(wildcard $(ROOT_DIR)/mkfiles/*.mk)

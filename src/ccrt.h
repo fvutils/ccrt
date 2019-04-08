@@ -8,3 +8,6 @@
 
 #include "RandObj.h"
 #include "RandVar.h"
+#include "RandInst.h"
+#include "ConstraintBuilderExpr.h"
+#include "ConstraintStmt.h"

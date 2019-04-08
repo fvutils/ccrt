@@ -10,7 +10,9 @@
 #include "RandObjCtor.h"
 #include "RandObj.h"
 #include "ExprBinaryOp.h"
+#include "ExprUnaryOp.h"
 #include "ExprVarRef.h"
+#include "ExprPartSelect.h"
 
 namespace ccrt {
 VarBase::VarBase(
@@ -107,14 +109,54 @@ ConstraintBuilderExpr VarBase::operator - (const ConstraintBuilderExpr &rhs) {
 					rhs.expr()));
 }
 
-ConstraintBuilderExpr VarBase::operator && (const ConstraintBuilderExpr &rhs) {
+ConstraintBuilderExpr VarBase::operator & (const ConstraintBuilderExpr &rhs) {
 	RandObjCtor::inst().pop_expr();
 
+	return ConstraintBuilderExpr(new ExprBinaryOp(
+					new ExprVarRef(this),
+					ExprBinaryOp::BinOp_And,
+					rhs.expr()));
+}
+
+ConstraintBuilderExpr VarBase::operator && (const ConstraintBuilderExpr &rhs) {
+	RandObjCtor::inst().pop_expr();
 
 	return ConstraintBuilderExpr(new ExprBinaryOp(
 					new ExprVarRef(this),
 					ExprBinaryOp::BinOp_AndAnd,
 					rhs.expr()));
+}
+
+ConstraintBuilderExpr VarBase::operator | (const ConstraintBuilderExpr &rhs) {
+	RandObjCtor::inst().pop_expr();
+
+	return ConstraintBuilderExpr(new ExprBinaryOp(
+					new ExprVarRef(this),
+					ExprBinaryOp::BinOp_Or,
+					rhs.expr()));
+}
+
+ConstraintBuilderExpr VarBase::operator || (const ConstraintBuilderExpr &rhs) {
+	RandObjCtor::inst().pop_expr();
+
+	return ConstraintBuilderExpr(new ExprBinaryOp(
+					new ExprVarRef(this),
+					ExprBinaryOp::BinOp_OrOr,
+					rhs.expr()));
+}
+
+ConstraintBuilderExpr VarBase::operator ! () {
+
+	return ConstraintBuilderExpr(new ExprUnaryOp(
+					ExprUnaryOp::UnOp_Not,
+					new ExprVarRef(this)));
+}
+
+ConstraintBuilderExpr VarBase::operator ~ () {
+
+	return ConstraintBuilderExpr(new ExprUnaryOp(
+					ExprUnaryOp::UnOp_Neg,
+					new ExprVarRef(this)));
 }
 
 ConstraintBuilderExpr VarBase::operator < (const ConstraintBuilderExpr &rhs) {
@@ -126,6 +168,40 @@ ConstraintBuilderExpr VarBase::operator < (const ConstraintBuilderExpr &rhs) {
 					new ExprVarRef(this),
 					ExprBinaryOp::BinOp_Lt,
 					rhs.expr()));
+}
+
+ConstraintBuilderExpr VarBase::operator <= (const ConstraintBuilderExpr &rhs) {
+	RandObjCtor::inst().pop_expr();
+
+	fprintf(stdout, "VarBase: LT\n");
+
+	return ConstraintBuilderExpr(new ExprBinaryOp(
+					new ExprVarRef(this),
+					ExprBinaryOp::BinOp_Le,
+					rhs.expr()));
+}
+
+ConstraintBuilderExpr VarBase::operator > (const ConstraintBuilderExpr &rhs) {
+	RandObjCtor::inst().pop_expr();
+
+	return ConstraintBuilderExpr(new ExprBinaryOp(
+					new ExprVarRef(this),
+					ExprBinaryOp::BinOp_Gt,
+					rhs.expr()));
+}
+
+ConstraintBuilderExpr VarBase::operator >= (const ConstraintBuilderExpr &rhs) {
+	RandObjCtor::inst().pop_expr();
+
+	return ConstraintBuilderExpr(new ExprBinaryOp(
+					new ExprVarRef(this),
+					ExprBinaryOp::BinOp_Ge,
+					rhs.expr()));
+}
+
+ConstraintBuilderExpr VarBase::operator [] (const Range &r) {
+	return ConstraintBuilderExpr(new ExprPartSelect(
+			new ExprVarRef(this), r));
 }
 
 void VarBase::do_pre_randomize() {

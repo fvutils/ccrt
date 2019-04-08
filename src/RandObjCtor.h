@@ -7,6 +7,7 @@
 #pragma once
 #include <stack>
 #include <vector>
+#include "IStmt.h"
 #include "RandObj.h"
 #include "ConstraintBuilderExpr.h"
 
@@ -54,16 +55,18 @@ public:
 			const ConstraintBuilderExpr &rhs);
 
 
-	void push_expr(IExpr *expr);
-	IExpr *pop_expr();
+	void push_expr(IStmt *expr);
+	IStmt *pop_expr();
 
-	const std::vector<IExpr *> &get_expressions() const {
+	const std::vector<IStmt *> &get_expressions() const {
 		return m_expressions;
 	}
 
 	void clear_expr() {
 		m_expressions.clear();
 	}
+
+	std::vector<IStmt *> truncate_expressions(uint32_t sz);
 
 	void push_constraint(BoolectorNode *c);
 	void pop_constraint(BoolectorNode *c);
@@ -97,7 +100,7 @@ private:
 private:
 	std::vector<RandObj *>					m_scope_stack;
 	std::vector<BoolectorNode *>			m_constraints;
-	std::vector<IExpr *>					m_expressions;
+	std::vector<IStmt *>					m_expressions;
 //	std::stack<CtorScope>			m_scope_stack;
 //	std::stack<RandObj *>			m_scope_stack;
 	RandObj									*m_active_rand_obj;

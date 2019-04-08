@@ -22,6 +22,9 @@ ExprBinaryOp::ExprBinaryOp(
 	case BinOp_Eq:
 	case BinOp_Neq:
 	case BinOp_Lt:
+	case BinOp_Le:
+	case BinOp_Gt:
+	case BinOp_Ge:
 		m_bits = 1;
 		break;
 
@@ -94,12 +97,30 @@ BoolectorNode *ExprBinaryOp::build_constraint(Btor *btor) {
 	BoolectorNode *ret = 0;
 	bool is_signed;
 
-	resize(btor, m_lhs, m_rhs, &lhs_n, &rhs_n, &is_signed);
+	// If the operation is a boolean operation, then
+	// ensure the operands are boolean as well
+	if (m_op == BinOp_AndAnd ||
+			m_op == BinOp_OrOr) {
+		to_boolean(btor, m_lhs, &lhs_n);
+		to_boolean(btor, m_rhs, &rhs_n);
+	} else {
+		// Otherwise, resize the operands to have equal sizes
+		resize(btor, m_lhs, m_rhs, &lhs_n, &rhs_n, &is_signed);
+	}
 
 	switch (m_op) {
 	case BinOp_Add:
 		ret = boolector_add(btor, lhs_n, rhs_n);
 		break;
+
+	case BinOp_And:
+		ret = boolector_and(btor, lhs_n, rhs_n);
+		break;
+
+	case BinOp_Or:
+		ret = boolector_or(btor, lhs_n, rhs_n);
+		break;
+
 	case BinOp_Sub:
 		ret = boolector_sub(btor, lhs_n, rhs_n);
 		break;
@@ -121,8 +142,42 @@ BoolectorNode *ExprBinaryOp::build_constraint(Btor *btor) {
 		ret = boolector_eq(btor, lhs_n, rhs_n);
 		break;
 
+	case BinOp_Ge:
+		if (is_signed) {
+			ret = boolector_sgte(btor, lhs_n, rhs_n);
+		} else {
+			ret = boolector_ugte(btor, lhs_n, rhs_n);
+		}
+		break;
+
+	case BinOp_Gt:
+		fprintf(stdout, "BinOp_Gt: lhs=%d rhs=%d\n",
+				m_lhs->bits(), m_rhs->bits());
+		if (is_signed) {
+			ret = boolector_sgt(btor, lhs_n, rhs_n);
+		} else {
+			ret = boolector_ugt(btor, lhs_n, rhs_n);
+		}
+		break;
+
 	case BinOp_Neq:
 		ret = boolector_not(btor, boolector_eq(btor, lhs_n, rhs_n));
+		break;
+
+	case BinOp_AndAnd:
+		ret = boolector_and(btor, lhs_n, rhs_n);
+		break;
+
+	case BinOp_OrOr:
+		ret = boolector_or(btor, lhs_n, rhs_n);
+		break;
+
+	case BinOp_Le:
+		if (is_signed) {
+			ret = boolector_slte(btor, lhs_n, rhs_n);
+		} else {
+			ret = boolector_ulte(btor, lhs_n, rhs_n);
+		}
 		break;
 
 	case BinOp_Lt:

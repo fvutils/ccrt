@@ -7,6 +7,7 @@
 #pragma once
 #include "IRandObj.h"
 #include "Value.h"
+#include "Range.h"
 #include <stdint.h>
 #include <string>
 #include "boolector/boolector.h"
@@ -54,9 +55,29 @@ public:
 
 	ConstraintBuilderExpr operator - (const ConstraintBuilderExpr &rhs);
 
+	ConstraintBuilderExpr operator & (const ConstraintBuilderExpr &rhs);
+
 	ConstraintBuilderExpr operator && (const ConstraintBuilderExpr &rhs);
 
+	ConstraintBuilderExpr operator | (const ConstraintBuilderExpr &rhs);
+
+	ConstraintBuilderExpr operator || (const ConstraintBuilderExpr &rhs);
+
+	ConstraintBuilderExpr operator ! ();
+
+	ConstraintBuilderExpr operator ~ ();
+
 	ConstraintBuilderExpr operator < (const ConstraintBuilderExpr &rhs);
+
+	ConstraintBuilderExpr operator <= (const ConstraintBuilderExpr &rhs);
+
+	ConstraintBuilderExpr operator > (const ConstraintBuilderExpr &rhs);
+
+	ConstraintBuilderExpr operator >= (const ConstraintBuilderExpr &rhs);
+
+	ConstraintBuilderExpr operator [] (const Range &r);
+
+	void in(const Range &r);
 
 protected:
 	Value				m_value;

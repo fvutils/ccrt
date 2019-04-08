@@ -7,18 +7,17 @@
 
 #pragma once
 #include "boolector/boolector.h"
+#include "IStmt.h"
 #include "Value.h"
 #include <stdint.h>
 
 namespace ccrt {
 
-class IExpr {
+class IExpr : public virtual IStmt {
 public:
 	virtual ~IExpr() { }
 
 	virtual Value value() = 0;
-
-	virtual BoolectorNode *build_constraint(Btor *btor) = 0;
 
 	virtual bool is_signed() const = 0;
 

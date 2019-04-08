@@ -20,10 +20,6 @@ public:
 	// Child element
 	RandVar(const char *name) : T(name) { }
 
-	bool randomize() {
-		return static_cast<T *>(this)->do_randomize();
-	}
-
 private:
 
 

@@ -8,6 +8,8 @@
 #include "RandObj.h"
 #include "RandObjCtor.h"
 #include "VarBase.h"
+#include "StmtBlock.h"
+#include "StmtIfElse.h"
 #include <stdio.h>
 
 namespace ccrt {
@@ -110,7 +112,30 @@ void RandObj::post_randomize() {
 	// Do Nothing
 }
 
-bool RandObj::do_randomize() {
+ConstraintStmtIfElse RandObj::if_then(
+		const ConstraintBuilderExpr			&expr,
+		const std::function<void ()>		&true_case) {
+	// Pop 'expr' off the stack
+	RandObjCtor::inst().pop_expr();
+
+	uint32_t pre_size = RandObjCtor::inst().get_expressions().size();
+	// Build the constraint statements within the body. This will cause
+	// the statements to be pushed onto the RandObjCtor list
+	true_case();
+	// Remove the newly-created statements
+	std::vector<IStmt *> stmts = RandObjCtor::inst().truncate_expressions(pre_size);
+
+	StmtIfElse *if_else = new StmtIfElse(
+		expr.expr(),
+		new StmtBlock(stmts)
+	);
+
+	RandObjCtor::inst().push_expr(if_else);
+
+	return ConstraintStmtIfElse(if_else);
+}
+
+bool RandObj::do_randomize(BoolectorNode *with) {
 	bool ret = false;
 	if (m_parent) {
 		// Can only randomize a root field
@@ -159,6 +184,20 @@ bool RandObj::do_randomize() {
 			fprintf(stdout, "Constraints are not satisfiable\n");
 		}
 		return false;
+	}
+
+	// Now, add in the randomize-with constraint if present
+	if (with) {
+		boolector_assert(btor(), with);
+
+		int32_t sat = boolector_sat(m_btor);
+
+		if (sat != BOOLECTOR_SAT) {
+			if (m_debug) {
+				fprintf(stdout, "Constraints added by 'with' are not satisfiable\n");
+			}
+			return false;
+		}
 	}
 
 	// TODO: loop trying to find a randomize
@@ -214,8 +253,10 @@ bool RandObj::do_randomize() {
 			// Initialize based on total_bits
 			if (total_bits > 10) {
 				bits = 10;
+			} else if (total_bits > 2) {
+				bits = total_bits / 4;
 			} else {
-				bits = total_bits;
+				bits = 1;
 			}
 		}
 
@@ -223,13 +264,15 @@ bool RandObj::do_randomize() {
 			char tmp[65];
 			// TODO: fix this equation a bit better
 			uint32_t seed = (next() & ((1 << bits)-1));
+//			uint32_t base = (next() % 16);
+			uint32_t base = 0;
 
 			for (uint32_t j=0; j<bits; j++) {
 				tmp[bits-j-1] = (seed & (1<<j))?'1':'0';
 			}
 			tmp[bits] = 0;
 
-			slice = boolector_slice(btor(), sum_node, bits-1, 0);
+			slice = boolector_slice(btor(), sum_node, bits+base-1, base);
 
 			BoolectorNode *eq_node = boolector_eq(btor(), slice,
 					boolector_const(btor(), tmp));

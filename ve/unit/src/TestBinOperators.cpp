@@ -32,7 +32,7 @@ TEST_F(TestBinOperators, eq) {
 		};
 	};
 
-	RandVar<abc>		abc_i;
+	RandInst<abc>		abc_i;
 
 	for (int i=0; i<10; i++) {
 		ASSERT_TRUE(abc_i.randomize());
@@ -57,12 +57,41 @@ TEST_F(TestBinOperators, neq) {
 		};
 	};
 
-	RandVar<abc>		abc_i;
+	RandInst<abc>		abc_i;
 
 	for (int i=0; i<10; i++) {
 		ASSERT_TRUE(abc_i.randomize());
 		ASSERT_TRUE((abc_i.a() != abc_i.b()));
 		ASSERT_TRUE((abc_i.b() != abc_i.c()));
+	}
+}
+
+TEST_F(TestBinOperators, le) {
+	class abc : public RandObj {
+	public:
+		abc(const CtorScope &scope) : RandObj(this) { }
+
+		RandVar<uint8_t>			a {"a"};
+		RandVar<uint8_t>			b {"b"};
+		RandVar<uint8_t>			c {"c"};
+
+		Constraint					abc_c { "abc_c", [this] {
+			b <= 10;
+			c <= 10;
+			a <= b;
+			a <= c;
+		}
+		};
+	};
+
+	RandInst<abc>		abc_i;
+
+	for (int i=0; i<10; i++) {
+		ASSERT_TRUE(abc_i.randomize());
+		ASSERT_TRUE((abc_i.b() <= 10));
+		ASSERT_TRUE((abc_i.c() <= 10));
+		ASSERT_TRUE((abc_i.a() <= (abc_i.b())));
+		ASSERT_TRUE((abc_i.a() <= (abc_i.c())));
 	}
 }
 
@@ -84,7 +113,7 @@ TEST_F(TestBinOperators, lt) {
 		};
 	};
 
-	RandVar<abc>		abc_i;
+	RandInst<abc>		abc_i;
 
 	for (int i=0; i<10; i++) {
 		ASSERT_TRUE(abc_i.randomize());
@@ -112,11 +141,90 @@ TEST_F(TestBinOperators, add) {
 		};
 	};
 
-	RandVar<abc>		abc_i;
+	RandInst<abc>		abc_i;
 
 	for (int i=0; i<10; i++) {
 		ASSERT_TRUE(abc_i.randomize());
 		ASSERT_TRUE((abc_i.a() == (abc_i.b() + abc_i.c())));
+	}
+}
+
+TEST_F(TestBinOperators, add2) {
+	class abc : public RandObj {
+	public:
+		abc(const CtorScope &scope) : RandObj(this) { }
+
+		RandVar<uint8_t>			a {"a"};
+		RandVar<uint8_t>			b {"b"};
+		RandVar<uint8_t>			c {"c"};
+		RandVar<uint8_t>			d {"d"};
+
+		Constraint					abc_c { "abc_c", [this] {
+			a < 10;
+			b < 10;
+			c < 10;
+			d < 10;
+			(a + b) == (c + d);
+		}
+		};
+	};
+
+	RandInst<abc>		abc_i;
+
+	for (int i=0; i<10; i++) {
+		ASSERT_TRUE(abc_i.randomize());
+		ASSERT_TRUE(((abc_i.a() + abc_i.b()) == (abc_i.c() + abc_i.d())));
+	}
+}
+
+TEST_F(TestBinOperators, bool_and) {
+	class abc : public RandObj {
+	public:
+		abc(const CtorScope &scope) : RandObj(this) { }
+
+		RandVar<uint8_t>			a {"a"};
+		RandVar<uint8_t>			b {"b"};
+
+		Constraint					abc_c { "abc_c", [this] {
+			// Both a and b must be non-zero
+			a && b;
+		}
+		};
+	};
+
+	RandInst<abc>		abc_i;
+
+	for (int i=0; i<10; i++) {
+		ASSERT_TRUE(abc_i.randomize());
+		ASSERT_TRUE((abc_i.a() != 0));
+		ASSERT_TRUE((abc_i.b() != 0));
+	}
+}
+
+TEST_F(TestBinOperators, bit_and) {
+	class abc : public RandObj {
+	public:
+		abc(const CtorScope &scope) : RandObj(this) { }
+
+		RandVar<uint8_t>			a {"a"};
+		RandVar<uint8_t>			b {"b"};
+
+		Constraint					abc_c { "abc_c", [this] {
+			// Both a and b must be non-zero
+			a && b;
+			a == (b & 0x3);
+		}
+		};
+	};
+
+	RandInst<abc>		abc_i;
+
+	for (int i=0; i<10; i++) {
+		ASSERT_TRUE(abc_i.randomize());
+		ASSERT_TRUE((abc_i.a() != 0));
+		ASSERT_TRUE((abc_i.b() != 0));
+
+		ASSERT_TRUE((abc_i.a() == (abc_i.b() & 0x3)));
 	}
 }
 

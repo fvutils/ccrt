@@ -6,7 +6,11 @@
  */
 #pragma once
 
+#include <functional>
+#include "ConstraintBuilderExpr.h"
+
 namespace ccrt {
+
 class ConstraintStmt {
 public:
 	ConstraintStmt();
@@ -15,5 +19,7 @@ public:
 
 
 };
+
+void implies(const ConstraintBuilderExpr &e, const std::function<void ()> &func);
 
 }

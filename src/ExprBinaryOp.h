@@ -15,13 +15,19 @@ class ExprBinaryOp : public ExprBase {
 public:
 	enum OpType {
 		BinOp_Add,
+		BinOp_And,
+		BinOp_Or,
 		BinOp_Sub,
 		BinOp_Mul,
 		BinOp_Div,
 		BinOp_Mod,
 		BinOp_Eq,
+		BinOp_Gt,
+		BinOp_Ge,
 		BinOp_Neq,
 		BinOp_AndAnd,
+		BinOp_OrOr,
+		BinOp_Le,
 		BinOp_Lt
 	};
 public:

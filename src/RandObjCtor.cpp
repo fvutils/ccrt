@@ -212,6 +212,17 @@ void RandObjCtor::resize(
 //	}
 }
 
+std::vector<IStmt *> RandObjCtor::truncate_expressions(uint32_t sz) {
+	std::vector<IStmt *> ret;
+
+	for (uint32_t i=sz; i<m_expressions.size(); i++) {
+		ret.push_back(m_expressions.at(i));
+	}
+	m_expressions.resize(sz);
+
+	return ret;
+}
+
 void RandObjCtor::push_constraint(BoolectorNode *c) {
 	m_constraints.push_back(c);
 }
@@ -249,13 +260,13 @@ void RandObjCtor::pop_constraint(BoolectorNode *c1, BoolectorNode *c2) {
 	}
 }
 
-void RandObjCtor::push_expr(IExpr *expr) {
+void RandObjCtor::push_expr(IStmt *expr) {
 	m_expressions.push_back(expr);
 }
 
-IExpr *RandObjCtor::pop_expr() {
+IStmt *RandObjCtor::pop_expr() {
 	if (m_expressions.size() > 0) {
-		IExpr *ret = m_expressions.back();
+		IStmt *ret = m_expressions.back();
 		m_expressions.pop_back();
 		return ret;
 	} else {

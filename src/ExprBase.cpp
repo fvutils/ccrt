@@ -32,6 +32,7 @@ void ExprBase::resize(
 	*is_signed = (v1->is_signed() && v2->is_signed());
 
 	if (v1->bits() > v2->bits()) {
+		fprintf(stdout, "v1 > v2: sign-extend\n");
 		if (v2->is_signed()) {
 			*v2_n = boolector_sext(
 					btor,
@@ -44,6 +45,7 @@ void ExprBase::resize(
 					(v1->bits()-v2->bits()));
 		}
 	} else if (v2->bits() > v1->bits()) {
+		fprintf(stdout, "v2 > v1: sign-extend\n");
 		if (v1->is_signed()) {
 			*v1_n = boolector_sext(
 					btor,
@@ -56,6 +58,28 @@ void ExprBase::resize(
 					(v2->bits()-v1->bits()));
 		}
 	}
+}
+
+void ExprBase::to_boolean(
+		Btor							*btor,
+		IExpr							*v,
+		BoolectorNode					**v_n) {
+	*v_n = v->build_constraint(btor);
+
+	fprintf(stdout, "to_boolean: bits=%d\n", v->bits());
+
+	if (v->bits() > 1) {
+		// Create a boolean expression
+		*v_n = boolector_not(btor,
+				boolector_eq(btor, *v_n,
+						boolector_zero(btor,
+								boolector_bitvec_sort(btor, v->bits())
+						)
+				)
+		);
+	}
+//	fprintf(stdout, "to_boolean: result bits=%d\n",
+//			boolector_get_bits(btor, *v_n));
 }
 
 } /* namespace ccrt */

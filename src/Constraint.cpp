@@ -30,8 +30,8 @@ void Constraint::finalize() {
 
 	ctor.clear_expr();
 	m_func(); // Call the builder function to create the actual constraints
-	const std::vector<IExpr *> &expr = ctor.get_expressions();
-	for (std::vector<IExpr *>::const_iterator it=expr.begin();
+	const std::vector<IStmt *> &expr = ctor.get_expressions();
+	for (std::vector<IStmt *>::const_iterator it=expr.begin();
 			it!=expr.end(); it++) {
 		BoolectorNode *c = (*it)->build_constraint(ctor.btor());
 		m_constraints.push_back(c);

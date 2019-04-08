@@ -9,8 +9,9 @@
 #include "IRandObj.h"
 #include <vector>
 #include <string>
+#include <functional>
 #include "CtorScope.h"
-#include "IfElse.h"
+#include "ConstraintStmtIfElse.h"
 #include "Constraint.h"
 #include "boolector/boolector.h"
 
@@ -23,6 +24,7 @@ template <typename T> class RandVar;
 class RandObj : public virtual IRandObj {
 public:
 	template <typename T> friend class RandVar;
+	template <typename T> friend class RandInst;
 	friend class VarBase;
 	friend class RandObjCtor;
 	friend class Constraint;
@@ -42,12 +44,15 @@ protected:
 
 
 
-	IfElse &if_then();
+	ConstraintStmtIfElse if_then(
+			const ConstraintBuilderExpr 	&expr,
+			const std::function<void ()>	&true_case
+			);
 
 	void constraint(ConstraintStmt &c);
 
 private:
-	bool do_randomize();
+	bool do_randomize(BoolectorNode *with = 0);
 
 	virtual void do_pre_randomize();
 

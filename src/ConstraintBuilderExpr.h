@@ -6,6 +6,7 @@
  */
 #pragma once
 #include <memory>
+#include <functional>
 #include "boolector/boolector.h"
 #include "IExpr.h"
 
@@ -39,10 +40,19 @@ public:
 
 	ConstraintBuilderExpr operator && (const ConstraintBuilderExpr &rhs);
 
+	ConstraintBuilderExpr operator < (const ConstraintBuilderExpr &rhs);
+
+	ConstraintBuilderExpr operator <= (const ConstraintBuilderExpr &rhs);
+
+	ConstraintBuilderExpr operator > (const ConstraintBuilderExpr &rhs);
+
+	ConstraintBuilderExpr operator >= (const ConstraintBuilderExpr &rhs);
+
 private:
 	IExpr						*m_expr;
 
 };
+
 
 } /* namespace ccrt */
 
