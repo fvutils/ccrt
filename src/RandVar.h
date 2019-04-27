@@ -60,7 +60,12 @@ public:
 
 	RandVar(const std::string &name=RandObjCtor::auto_name()) : VarBase(name, 8, false, true) { }
 
-	uint8_t operator ()() {
+	uint8_t operator ()() const {
+		// TODO: need to map value over?
+		return m_value.val.u8;
+	}
+
+	uint8_t &operator ()() {
 		// TODO: need to map value over?
 		return m_value.val.u8;
 	}
@@ -87,7 +92,12 @@ public:
 
 	RandVar(const std::string &name) : VarBase(name, 8, true, true) { }
 
-	int8_t operator ()() {
+	int8_t operator ()() const {
+		// TODO: need to map value over?
+		return m_value.val.s8;
+	}
+
+	int8_t &operator ()() {
 		// TODO: need to map value over?
 		return m_value.val.s8;
 	}

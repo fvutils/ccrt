@@ -26,6 +26,8 @@ public:
 
 	void sample();
 
+	double get_coverage();
+
 private:
 	void sample(
 			uint32_t					cp_idx,
