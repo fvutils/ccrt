@@ -19,10 +19,16 @@ endif
 include $(ROOT_DIR)/etc/ivpm.info
 PROJECT := $(name)
 
-SRC_FILES := $(wildcard $(ROOT_DIR)/src/*.cpp)
+SRC_FILES := \
+	$(wildcard $(ROOT_DIR)/src/*.cpp) \
+	$(wildcard $(ROOT_DIR)/src/model/*.cpp) \
+	$(wildcard $(ROOT_DIR)/src/impl/*.cpp)
+
 CXXFLAGS += -std=c++11 -I$(ROOT_DIR)/boolector/include
 #CXXFLAGS += -g
 CXXFLAGS += -O3
+
+CXXFLAGS += $(foreach d,$(SRC_DIRS),-I$(d))
 
 # Include makefiles with dependencies
 MK_INCLUDES += $(wildcard $(ROOT_DIR)/mkfiles/*.mk)
@@ -34,7 +40,7 @@ BOOLECTOR_DIR=boolector-master
 BOOLECTOR_ZIP=$(BOOLECTOR_DIR).zip
 BOOLECTOR_URL=https://github.com/Boolector/boolector/archive/master.zip
 
-SRC_DIRS += $(ROOT_DIR)/src
+SRC_DIRS += $(ROOT_DIR)/src $(ROOT_DIR)/src/model $(ROOT_DIR)/src/impl
 
 RULES := 1
 

@@ -11,15 +11,19 @@
 #include <string>
 #include <functional>
 #include "CtorScope.h"
-#include "ConstraintStmtIfElse.h"
 #include "Constraint.h"
+#include "Range.h"
+#include <initializer_list>
+#include <vector>
 #include "boolector/boolector.h"
+#include "impl/ConstraintStmtIfElse.h"
 
 namespace ccrt {
 
 class Expr;
 class ConstraintStmt;
 class VarBase;
+class CovergroupModel;
 template <typename T> class RandVar;
 class RandObj : public virtual IRandObj {
 public:
@@ -28,6 +32,7 @@ public:
 	friend class VarBase;
 	friend class RandObjCtor;
 	friend class Constraint;
+	friend class CovergroupModel;
 	RandObj();
 
 	RandObj(const CtorScope &scope);
@@ -42,12 +47,17 @@ protected:
 
 	virtual void post_randomize();
 
+	void set_ref(IRandObj *ref);
 
 
 	ConstraintStmtIfElse if_then(
 			const ConstraintBuilderExpr 	&expr,
 			const std::function<void ()>	&true_case
 			);
+
+	ConstraintBuilderExpr in(
+			const ConstraintBuilderExpr		&expr,
+			std::initializer_list<Range>	range);
 
 	void constraint(ConstraintStmt &c);
 
@@ -81,28 +91,30 @@ private:
 
 private:
 	// handle to the parent object (or null if this is the root)
-	RandObj						*m_parent;
+	RandObj								*m_parent;
 
 
 	// Seed for the root object
-	uint32_t					m_seed;
+	uint32_t							m_seed;
 
-	uint32_t					m_depth;
+	uint32_t							m_depth;
 
-	Btor						*m_btor;
+	Btor								*m_btor;
 	// TODO: handle to solver for this object
 
-	std::vector<VarBase *>		m_variables;
-	std::vector<Constraint *>	m_root_constraints;
+	std::vector<VarBase *>				m_variables;
+	std::vector<Constraint *>			m_root_constraints;
 
-	std::vector<IRandObj *>		m_children;
+	std::vector<IRandObj *>				m_children;
+
+	std::vector<CovergroupModel *>		m_covergroups;
 
 	// Collection of active constraint blocks for this type
 	// Note: base classes are constructed before extended classes,
 	// so we can iteratively 'kick out' overridden constraints
-	std::vector<Constraint *>	m_constraints;
+	std::vector<Constraint *>			m_constraints;
 
-	bool						m_debug;
+	bool								m_debug;
 
 };
 

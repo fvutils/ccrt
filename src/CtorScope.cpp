@@ -6,9 +6,9 @@
  */
 
 #include "CtorScope.h"
-#include "RandObjCtor.h"
 #include "RandObj.h"
 #include <stdio.h>
+#include "impl/RandObjCtor.h"
 
 namespace ccrt {
 

@@ -6,8 +6,9 @@
  */
 #pragma once
 #include <stdint.h>
-#include "VarBase.h"
-#include "RandObjCtor.h"
+
+#include "impl/RandObjCtor.h"
+#include "model/VarBase.h"
 
 namespace ccrt {
 

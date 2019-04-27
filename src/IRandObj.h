@@ -19,6 +19,8 @@ public:
 
 	virtual void finalize(RandObj *root) = 0;
 
+	virtual void set_ref(IRandObj *ref) = 0;
+
 private:
 
 	virtual void do_pre_randomize() = 0;

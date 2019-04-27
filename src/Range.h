@@ -12,7 +12,7 @@ namespace ccrt {
 
 class Range {
 public:
-	Range(uint32_t rhs, uint32_t lhs) : m_rhs(rhs), m_lhs(lhs) { }
+	Range(uint32_t lhs, uint32_t rhs) : m_rhs(rhs), m_lhs(lhs) { }
 
 	Range(uint32_t bit) : m_rhs(bit), m_lhs(bit) { }
 

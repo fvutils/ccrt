@@ -6,7 +6,8 @@
  */
 
 #include "Constraint.h"
-#include "RandObjCtor.h"
+
+#include "impl/RandObjCtor.h"
 #include "RandObj.h"
 
 namespace ccrt {

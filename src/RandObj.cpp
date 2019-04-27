@@ -6,11 +6,14 @@
  */
 
 #include "RandObj.h"
-#include "RandObjCtor.h"
-#include "VarBase.h"
-#include "StmtBlock.h"
-#include "StmtIfElse.h"
 #include <stdio.h>
+
+#include "impl/RandObjCtor.h"
+#include "model/ExprIn.h"
+#include "model/StmtBlock.h"
+#include "model/StmtIfElse.h"
+#include "model/VarBase.h"
+#include "model/CovergroupModel.h"
 
 namespace ccrt {
 
@@ -112,6 +115,35 @@ void RandObj::post_randomize() {
 	// Do Nothing
 }
 
+void RandObj::set_ref(IRandObj *ref) {
+
+	if (ref) {
+		RandObj *ref_o = dynamic_cast<RandObj *>(ref);
+
+		fprintf(stdout, "set_ref: ref=%p, ref_o=%p\n", ref, ref_o);
+
+		if (!ref_o) {
+			fprintf(stderr, "Error: failed to cast IRandObj back to RandObj\n");
+		}
+
+		std::vector<IRandObj *>::iterator t_it=m_children.begin();
+		std::vector<IRandObj *>::iterator r_it=ref_o->m_children.begin();
+
+		while (t_it != m_children.end()) {
+			(*t_it)->set_ref(*r_it);
+
+			t_it++;
+			r_it++;
+		}
+	} else {
+		// Reset the ref back to the original vaue
+		for (std::vector<IRandObj *>::iterator it=m_children.begin();
+				it!=m_children.end(); it++) {
+			(*it)->set_ref(0);
+		}
+	}
+}
+
 ConstraintStmtIfElse RandObj::if_then(
 		const ConstraintBuilderExpr			&expr,
 		const std::function<void ()>		&true_case) {
@@ -133,6 +165,15 @@ ConstraintStmtIfElse RandObj::if_then(
 	RandObjCtor::inst().push_expr(if_else);
 
 	return ConstraintStmtIfElse(if_else);
+}
+
+ConstraintBuilderExpr RandObj::in(
+			const ConstraintBuilderExpr		&expr,
+			std::initializer_list<Range>	range) {
+	// Pop the 'expr' constraint off the stack
+	RandObjCtor::inst().pop_expr();
+
+	return ConstraintBuilderExpr(new ExprIn(expr.expr(), range));
 }
 
 bool RandObj::do_randomize(BoolectorNode *with) {

@@ -6,14 +6,14 @@
  */
 #pragma once
 #include "RandObj.h"
-#include "RandObjCtor.h"
 #include <functional>
+#include "impl/RandObjCtor.h"
 
 namespace ccrt {
 template <class T> class RandInst : public T {
 public:
 
-	RandInst() : T(0) {
+	RandInst() : T((RandObj *)0) {
 
 	}
 

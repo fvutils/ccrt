@@ -9,6 +9,7 @@
 #include <functional>
 #include <vector>
 #include "boolector/boolector.h"
+#include "IStmt.h"
 
 namespace ccrt {
 class RandObj;
@@ -16,6 +17,7 @@ class RandObj;
 class Constraint {
 public:
 	Constraint(const std::string &name, const std::function<void ()> &func);
+
 	virtual ~Constraint();
 
 	const std::string &name() const { return m_name; }

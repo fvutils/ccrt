@@ -66,3 +66,27 @@ We need expressions for two reasons:
 - Build variables as we go
 - Build applicable constraint blocks once the entire root object is constructed
   - Cannot really reference fields until later
+
+# Coverage Model
+
+- A CoverpointBinCollectionModel holds a set of coverpoint bin models (is this really just a coverpoint?)
+  - Each ICoverpointBinModel can independently have a hit on each sample
+  - Each ICoverpointBinModel has >=1 bin
+
+- Types of ICoverpointBinModel:
+  - CoverpointSingleBinModel -- bin with a collection of ranges that describe the bin
+  - CoverpointMultiBinModel -- bin with a collection of single bin models
+  - CoverpointArrayBinModel -- bin with a linear array of bins
+
+- Each coverpoint holds a set of bin collections, which are named
+- Each coverpoint holds a vector of pointers to the bins in the bin collections
+  that are sorted in 
+- Each coverpoint holds two maps: unhit bins, and unreachable bins
+-> The keys to these maps are an index into the bin-collection vector
+-> Initially, the unreachable bins map is empty and the unhit bins map is fully populated
+- Each sample must search this set to determine 
+- Each bin collection maintains information on hit, unhit, and illegal bins
+
+
+
+

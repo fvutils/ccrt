@@ -37,7 +37,6 @@ TEST_F(TestInOperator, single_range_1) {
 
 	for (int i=0; i<10; i++) {
 		ASSERT_TRUE(abc_i.randomize());
-		fprintf(stdout, "a=%d\n", abc_i.a());
 		ASSERT_TRUE(abc_i.a() >= 1 && abc_i.a() <= 100);
 	}
 }

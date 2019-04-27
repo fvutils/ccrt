@@ -6,7 +6,7 @@ include $(PACKAGES_DIR)/packages.mk
 
 CXXFLAGS += -std=c++11
 CXXFLAGS += -g
-CXXFLAGS += -O3
+#CXXFLAGS += -O3
 
 SRC_DIRS += $(VE_UNIT_DIR)/src
 SRC_DIRS += $(CCRT_DIR)/src
