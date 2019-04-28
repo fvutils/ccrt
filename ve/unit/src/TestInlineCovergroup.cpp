@@ -75,13 +75,11 @@ TEST_F(TestInlineCovergroup,cross_array_rand) {
 		InlineCovergroup				cg {"cg", [this] {
 			// TODO: need an auto-bin covergroup?
 			Coverpoint				a_cp {"a_cp", a, [this] {
-				Bins foo = {"foo", { {0,7} }};
-				Bins bar = {"bar", { {8,15} }};
+				Bins foo = {"foo", { {0,15} }};
 			}};
 
 			Coverpoint				b_cp {"b_cp", b, [this] {
-				Bins foo = {"foo", { {0,7} }};
-				Bins bar = {"bar", { {8,15} }};
+				Bins foo = {"foo", { {0,15} }};
 			}};
 
 			Cross 					ab_cross {"ab_cross",

@@ -5,7 +5,7 @@
  *      Author: ballance
  */
 #include "gtest/gtest.h"
-#include "ccrt.h"
+#include "ccrt/ccrt.h"
 
 class TestConstraintStmts : public ::testing::Test {
 public:

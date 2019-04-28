@@ -6,7 +6,7 @@
  */
 #pragma once
 #include "gtest/gtest.h"
-#include "ccrt.h"
+#include "ccrt/ccrt.h"
 
 
 class TestCovergroup : public ::testing::Test {

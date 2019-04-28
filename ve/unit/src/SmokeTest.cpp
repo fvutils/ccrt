@@ -6,7 +6,7 @@
  */
 
 #include "SmokeTest.h"
-#include "ccrt.h"
+#include "ccrt/ccrt.h"
 
 using namespace ccrt;
 

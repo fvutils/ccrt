@@ -9,8 +9,8 @@ CXXFLAGS += -g
 #CXXFLAGS += -O3
 
 SRC_DIRS += $(VE_UNIT_DIR)/src
-SRC_DIRS += $(CCRT_DIR)/src
-SRC_DIRS += $(CCRT_DIR)/boolector/include
+#SRC_DIRS += $(CCRT_DIR)/src
+SRC_DIRS += $(CCRT_DIR)/build/ccrt/include
 
 UNIT_TEST_SRC_FILES = $(wildcard $(VE_UNIT_DIR)/src/*.cpp)
 UNIT_TEST_SRCS = $(notdir $(UNIT_TEST_SRC_FILES))
@@ -25,19 +25,19 @@ RULES := 1
 all : 
 	mkdir -p build
 	$(MAKE) -C build -f $(VE_UNIT_DIR)/Makefile ve_unit
-	export LD_LIBRARY_PATH=$(CCRT_DIR)/boolector/lib:$(VE_UNIT_DIR)/build ; \
+	export LD_LIBRARY_PATH=$(CCRT_DIR)/build/ccrt/lib ; \
 		./build/ve_unit $(ARGS)
 
 debug : 
 	mkdir -p build
 	cd build ; $(MAKE) -f $(VE_UNIT_DIR)/Makefile ve_unit
-	export LD_LIBRARY_PATH=$(CCRT_DIR)/boolector/lib:$(VE_UNIT_DIR)/build ; \
+	export LD_LIBRARY_PATH=$(CCRT_DIR)/build/ccrt/lib ; \
 		gdb --args ./build/ve_unit $(ARGS)
 
 valgrind : 
 	mkdir -p build
 	cd build ; $(MAKE) -f $(VE_UNIT_DIR)/Makefile ve_unit
-	export LD_LIBRARY_PATH=$(CCRT_DIR)/boolector/lib:$(VE_UNIT_DIR)/build ; \
+	export LD_LIBRARY_PATH=$(CCRT_DIR)/build/ccrt/lib ; \
 		valgrind --tool=memcheck ./build/ve_unit
 
 vpath %.cpp $(SRC_DIRS)
@@ -48,14 +48,18 @@ $(UNIT_TEST_SRC_FILES) : ccrt.d
 ve_unit : $(UNIT_TEST_SRCS:.cpp=.o) libgoogletest.o
 	$(CXX) -o $@ $(UNIT_TEST_SRCS:.cpp=.o) \
 		libgoogletest.o \
-		-I$(CCRT_DIR)/boolector/include -I$(CCRT_DIR)/src \
-		-L$(CCRT_DIR)/boolector/lib -L. -lboolector -lccrt -lpthread
+		-I$(CCRT_DIR)/build/ccrt/include \
+		-L$(CCRT_DIR)/build/ccrt/lib \
+			-lboolector -lccrt -lpthread
 
 ccrt.d : 
-	$(MAKE) -f $(CCRT_DIR)/scripts/ivpm.mk
+	$(MAKE) -f $(CCRT_DIR)/scripts/ivpm.mk build
 
 clean :
 	rm -rf *.o *.so ve_unit build
+
+clean-all : clean
+	rm -rf $(CCRT_DIR)/build/obj
 
 include $(PACKAGES_DIR)/packages.mk
 
