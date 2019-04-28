@@ -7,7 +7,7 @@
 #pragma once
 #include <functional>
 #include "ccrt/impl/CovergroupObj.h"
-#include "CtorScope.h"
+#include "ccrt/impl/CtorScope.h"
 
 namespace ccrt {
 

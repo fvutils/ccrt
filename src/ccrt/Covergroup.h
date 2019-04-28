@@ -6,7 +6,7 @@
  */
 #pragma once
 #include "ccrt/impl/CovergroupObj.h"
-#include "CtorScope.h"
+#include "ccrt/impl/CtorScope.h"
 #include "RandObj.h"
 #include <functional>
 #include "ccrt/impl/ConstraintBuilderExpr.h"

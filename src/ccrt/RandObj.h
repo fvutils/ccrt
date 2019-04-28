@@ -10,9 +10,9 @@
 #include <vector>
 #include <string>
 #include <functional>
-#include "CtorScope.h"
-#include "Constraint.h"
-#include "Range.h"
+#include "ccrt/impl/CtorScope.h"
+#include "ccrt/Constraint.h"
+#include "ccrt/Range.h"
 #include <initializer_list>
 #include <vector>
 #include "boolector/boolector.h"
