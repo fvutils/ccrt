@@ -55,7 +55,10 @@ BOOLECTOR_DIR=boolector-master
 BOOLECTOR_ZIP=$(BOOLECTOR_DIR).zip
 BOOLECTOR_URL=https://github.com/Boolector/boolector/archive/master.zip
 
-SRC_DIRS += $(ROOT_DIR)/src $(ROOT_DIR)/src/model $(ROOT_DIR)/src/impl
+SRC_DIRS += $(ROOT_DIR)/src
+SRC_DIRS += $(ROOT_DIR)/src/ccrt 
+SRC_DIRS += $(ROOT_DIR)/src/ccrt/model 
+SRC_DIRS += $(ROOT_DIR)/src/ccrt/impl
 
 RULES := 1
 
